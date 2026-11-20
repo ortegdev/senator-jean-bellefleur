@@ -1,3 +1,4 @@
+'use client'
 import { useTranslations } from 'next-intl'
 import { RevealOnScroll } from '@/components/client/RevealOnScroll'
 

@@ -1,4 +1,4 @@
-import { useTranslations } from 'next-intl'
+import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/routing'
 import { getCandidateConfig } from '@/lib/config/candidate'
 import { getCurrentMode } from '@/lib/launch-gate/mode'
@@ -10,7 +10,7 @@ import { LaunchMode } from '@prisma/client'
 export async function SignupBlock() {
   const config = await getCandidateConfig()
   const mode = await getCurrentMode()
-  const t = useTranslations('home.signup')
+  const t = await getTranslations('home.signup')
 
   const content: Record<LaunchMode, { heading: string; description: string; cta: string; href: string }> = {
     INFO_ONLY: {

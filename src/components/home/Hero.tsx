@@ -1,4 +1,4 @@
-import { useTranslations } from 'next-intl'
+import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/routing'
 import { getCandidateConfig } from '@/lib/config/candidate'
 import { getCurrentMode } from '@/lib/launch-gate/mode'
@@ -9,8 +9,8 @@ import { LaunchMode } from '@prisma/client'
 export async function Hero() {
   const config = await getCandidateConfig()
   const mode = await getCurrentMode()
-  const t = useTranslations('home.hero')
-  const tCta = useTranslations('cta')
+  const t = await getTranslations('home.hero')
+  const tCta = await getTranslations('cta')
 
   // Determine title based on candidacy status
   const isUnverified = config.candidacyStatus === 'UNVERIFIED'

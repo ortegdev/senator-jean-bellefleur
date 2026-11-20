@@ -1,4 +1,4 @@
-import { useTranslations } from 'next-intl'
+import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/routing'
 import { getCandidateConfig } from '@/lib/config/candidate'
 import { Button } from '@/components/ui/Button'
@@ -6,7 +6,7 @@ import { RevealOnScroll } from '@/components/client/RevealOnScroll'
 
 export async function CandidateTeaser() {
   const config = await getCandidateConfig()
-  const t = useTranslations('home.candidateTeaser')
+  const t = await getTranslations('home.candidateTeaser')
 
   return (
     <RevealOnScroll>

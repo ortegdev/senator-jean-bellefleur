@@ -1,4 +1,4 @@
-import { useTranslations } from 'next-intl'
+import { getTranslations } from 'next-intl/server'
 import { getContributionStats } from '@/lib/data/contributions'
 import { getCandidateConfig } from '@/lib/config/candidate'
 import { formatUSD } from '@/lib/i18n/currency'
@@ -12,7 +12,7 @@ interface LiveProgressProps {
 }
 
 export async function LiveProgress({ locale }: LiveProgressProps) {
-  const t = useTranslations('home.progress')
+  const t = await getTranslations('home.progress')
   const stats = await getContributionStats()
   const config = await getCandidateConfig()
 
