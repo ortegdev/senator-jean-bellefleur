@@ -12,8 +12,9 @@ import { PreferenceCenterClient } from '@/components/communications/PreferenceCe
 export async function generateMetadata({
   params,
 }: {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }): Promise<Metadata> {
+  const { locale } = await params
   const t = await getTranslations('communications.preferences')
   
   return {
@@ -26,13 +27,15 @@ export default async function PreferencesPage({
   params,
   searchParams,
 }: {
-  params: { locale: string }
-  searchParams: { token?: string }
+  params: Promise<{ locale: string }>
+  searchParams: Promise<{ token?: string }>
 }) {
+  const { locale } = await params
+  const { token } = await searchParams
   const t = await getTranslations('communications.preferences')
   
   // Require magic link token
-  if (!searchParams.token) {
+  if (!token) {
     return (
       <div className="container mx-auto px-4 py-16 max-w-2xl">
         <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6">
@@ -59,7 +62,7 @@ export default async function PreferencesPage({
         {t('description')}
       </p>
       
-      <PreferenceCenterClient token={searchParams.token} locale={params.locale} />
+      <PreferenceCenterClient token={token} locale={locale} />
     </div>
   )
 }

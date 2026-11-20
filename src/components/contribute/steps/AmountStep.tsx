@@ -146,7 +146,7 @@ export function AmountStep({ config, initialAmount, onComplete }: AmountStepProp
             placeholder={`${minDollars} - ${maxDollars}`}
             className={`
               w-full h-12 pl-8 pr-4 border rounded-lg text-lg
-              focus:outline-none focus:ring-3 focus:ring-seaGreen/30 focus:border-seaGreen
+              focus:outline-none focus:ring-2 focus:ring-seaGreen/30 focus:border-seaGreen
               ${selectedPreset ? 'border-deepLagoon-200 bg-sandPaper/50' : 'border-deepLagoon-300'}
             `}
             inputMode="decimal"

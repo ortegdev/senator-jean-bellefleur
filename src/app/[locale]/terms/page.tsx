@@ -26,15 +26,16 @@ import '@/app/styles/legal.css'
 export async function generateMetadata({
   params,
 }: {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }): Promise<Metadata> {
+  const { locale } = await params
   const titles = {
     en: 'Terms of Service',
     fr: 'Conditions d\'utilisation',
     ht: 'Kondisyon Sèvis',
   }
 
-  const title = titles[params.locale as keyof typeof titles] || titles.en
+  const title = titles[locale as keyof typeof titles] || titles.en
 
   return {
     title: `${title} | Diaspora4Bellefleur`,
@@ -49,9 +50,10 @@ export async function generateMetadata({
 export default async function TermsPage({
   params,
 }: {
-  params: { locale: string }
+  params: Promise<{ locale: string }>
 }) {
-  const locale = params.locale as 'ht' | 'fr' | 'en'
+  const { locale: localeValue } = await params
+  const locale = localeValue as 'ht' | 'fr' | 'en'
 
   if (!['ht', 'fr', 'en'].includes(locale)) {
     notFound()

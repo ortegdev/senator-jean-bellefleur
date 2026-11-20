@@ -27,9 +27,9 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 interface RouteContext {
-  params: {
+  params: Promise<{
     provider: string
-  }
+  }>
 }
 
 /**
@@ -42,7 +42,7 @@ export async function POST(
   request: NextRequest,
   context: RouteContext
 ): Promise<NextResponse> {
-  const { provider: providerName } = context.params
+  const { provider: providerName } = await context.params
 
   try {
     // Step 1: Get provider instance

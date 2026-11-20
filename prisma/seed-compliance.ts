@@ -5,7 +5,7 @@
  * Rules start as DRAFT and require dual approval before activation.
  */
 
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Prisma } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -60,7 +60,7 @@ async function main() {
       name: amountLimitRule.name,
       description: amountLimitRule.description,
       ruleType: amountLimitRule.ruleType,
-      config: amountLimitRule.config,
+      config: amountLimitRule.config as Prisma.InputJsonValue,
       legalBasisReference: amountLimitRule.legalBasisReference,
       effectiveFrom: amountLimitRule.effectiveFrom,
       effectiveTo: amountLimitRule.effectiveTo,
@@ -96,7 +96,7 @@ async function main() {
       name: cumulativeCapRule.name,
       description: cumulativeCapRule.description,
       ruleType: cumulativeCapRule.ruleType,
-      config: cumulativeCapRule.config,
+      config: cumulativeCapRule.config as Prisma.InputJsonValue,
       legalBasisReference: cumulativeCapRule.legalBasisReference,
       effectiveFrom: cumulativeCapRule.effectiveFrom,
       effectiveTo: cumulativeCapRule.effectiveTo,
@@ -132,7 +132,7 @@ async function main() {
       name: countryRule.name,
       description: countryRule.description,
       ruleType: countryRule.ruleType,
-      config: countryRule.config,
+      config: countryRule.config as Prisma.InputJsonValue,
       legalBasisReference: countryRule.legalBasisReference,
       effectiveFrom: countryRule.effectiveFrom,
       effectiveTo: countryRule.effectiveTo,
@@ -171,7 +171,7 @@ async function main() {
       name: eligibilityRule.name,
       description: eligibilityRule.description,
       ruleType: eligibilityRule.ruleType,
-      config: eligibilityRule.config,
+      config: eligibilityRule.config as Prisma.InputJsonValue,
       legalBasisReference: eligibilityRule.legalBasisReference,
       effectiveFrom: eligibilityRule.effectiveFrom,
       effectiveTo: eligibilityRule.effectiveTo,
@@ -207,7 +207,7 @@ async function main() {
       name: sanctionsRule.name,
       description: sanctionsRule.description,
       ruleType: sanctionsRule.ruleType,
-      config: sanctionsRule.config,
+      config: sanctionsRule.config as Prisma.InputJsonValue,
       legalBasisReference: sanctionsRule.legalBasisReference,
       effectiveFrom: sanctionsRule.effectiveFrom,
       effectiveTo: sanctionsRule.effectiveTo,
@@ -244,7 +244,7 @@ async function main() {
       name: prohibitedSourceRule.name,
       description: prohibitedSourceRule.description,
       ruleType: prohibitedSourceRule.ruleType,
-      config: prohibitedSourceRule.config,
+      config: prohibitedSourceRule.config as Prisma.InputJsonValue,
       legalBasisReference: prohibitedSourceRule.legalBasisReference,
       effectiveFrom: prohibitedSourceRule.effectiveFrom,
       effectiveTo: prohibitedSourceRule.effectiveTo,
@@ -280,7 +280,7 @@ async function main() {
       name: preCampaignRule.name,
       description: preCampaignRule.description,
       ruleType: preCampaignRule.ruleType,
-      config: preCampaignRule.config,
+      config: preCampaignRule.config as Prisma.InputJsonValue,
       legalBasisReference: preCampaignRule.legalBasisReference,
       effectiveFrom: preCampaignRule.effectiveFrom,
       effectiveTo: preCampaignRule.effectiveTo,

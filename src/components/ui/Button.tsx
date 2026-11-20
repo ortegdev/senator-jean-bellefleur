@@ -39,7 +39,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      'inline-flex items-center justify-center gap-2 font-sans font-semibold transition-all duration-fast focus:outline-none focus:ring-3 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+      'inline-flex items-center justify-center gap-2 font-sans font-semibold transition-all duration-fast focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
 
     const variants = {
       primary:

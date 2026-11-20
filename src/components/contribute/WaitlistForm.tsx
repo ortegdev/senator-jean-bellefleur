@@ -129,7 +129,7 @@ export function WaitlistForm({ config, mode }: WaitlistFormProps) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={t('waitlist.emailPlaceholder')}
-                className="w-full h-12 px-4 border border-deepLagoon-300 rounded-lg focus:outline-none focus:ring-3 focus:ring-seaGreen/30 focus:border-seaGreen"
+                className="w-full h-12 px-4 border border-deepLagoon-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-seaGreen/30 focus:border-seaGreen"
                 autoComplete="email"
               />
               {email && (
@@ -158,7 +158,7 @@ export function WaitlistForm({ config, mode }: WaitlistFormProps) {
                 value={whatsapp}
                 onChange={(e) => setWhatsapp(e.target.value)}
                 placeholder={t('waitlist.whatsappPlaceholder')}
-                className="w-full h-12 px-4 border border-deepLagoon-300 rounded-lg focus:outline-none focus:ring-3 focus:ring-seaGreen/30 focus:border-seaGreen"
+                className="w-full h-12 px-4 border border-deepLagoon-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-seaGreen/30 focus:border-seaGreen"
                 autoComplete="tel"
               />
               {whatsapp && (

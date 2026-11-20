@@ -124,7 +124,7 @@ export function DetailsStep({ config, initialData, onComplete, onBack }: Details
               type="text"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              className={`w-full h-12 px-4 border rounded-lg focus:outline-none focus:ring-3 focus:ring-seaGreen/30 focus:border-seaGreen ${
+              className={`w-full h-12 px-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-seaGreen/30 focus:border-seaGreen ${
                 errors.firstName ? 'border-coral' : 'border-deepLagoon-300'
               }`}
               autoComplete="given-name"
@@ -147,7 +147,7 @@ export function DetailsStep({ config, initialData, onComplete, onBack }: Details
               type="text"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              className={`w-full h-12 px-4 border rounded-lg focus:outline-none focus:ring-3 focus:ring-seaGreen/30 focus:border-seaGreen ${
+              className={`w-full h-12 px-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-seaGreen/30 focus:border-seaGreen ${
                 errors.lastName ? 'border-coral' : 'border-deepLagoon-300'
               }`}
               autoComplete="family-name"
@@ -172,7 +172,7 @@ export function DetailsStep({ config, initialData, onComplete, onBack }: Details
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className={`w-full h-12 px-4 border rounded-lg focus:outline-none focus:ring-3 focus:ring-seaGreen/30 focus:border-seaGreen ${
+            className={`w-full h-12 px-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-seaGreen/30 focus:border-seaGreen ${
               errors.email ? 'border-coral' : 'border-deepLagoon-300'
             }`}
             autoComplete="email"
@@ -198,7 +198,7 @@ export function DetailsStep({ config, initialData, onComplete, onBack }: Details
             value={country}
             onChange={(e) => setCountry(e.target.value)}
             placeholder={t('countryPlaceholder')}
-            className={`w-full h-12 px-4 border rounded-lg focus:outline-none focus:ring-3 focus:ring-seaGreen/30 focus:border-seaGreen ${
+            className={`w-full h-12 px-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-seaGreen/30 focus:border-seaGreen ${
               errors.country ? 'border-coral' : 'border-deepLagoon-300'
             }`}
             autoComplete="country-name"
@@ -221,7 +221,7 @@ export function DetailsStep({ config, initialData, onComplete, onBack }: Details
             id="communeOfOrigin"
             value={communeOfOrigin}
             onChange={(e) => setCommuneOfOrigin(e.target.value)}
-            className="w-full h-12 px-4 border border-deepLagoon-300 rounded-lg focus:outline-none focus:ring-3 focus:ring-seaGreen/30 focus:border-seaGreen"
+            className="w-full h-12 px-4 border border-deepLagoon-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-seaGreen/30 focus:border-seaGreen"
           >
             <option value="">{t('communeSelect')}</option>
             {COMMUNES.map((commune) => (
@@ -333,7 +333,7 @@ export function DetailsStep({ config, initialData, onComplete, onBack }: Details
             placeholder={t('dedicationPlaceholder')}
             rows={2}
             maxLength={140}
-            className="w-full px-4 py-3 border border-deepLagoon-300 rounded-lg focus:outline-none focus:ring-3 focus:ring-seaGreen/30 focus:border-seaGreen resize-none"
+            className="w-full px-4 py-3 border border-deepLagoon-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-seaGreen/30 focus:border-seaGreen resize-none"
           />
           <p className="mt-1 text-xs text-ink/50 text-right">
             {dedication.length}/140

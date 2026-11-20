@@ -15,13 +15,14 @@ import { getTranslations } from 'next-intl/server'
 import type { Metadata } from 'next'
 
 interface VerifyPageProps {
-  params: {
+  params: Promise<{
     locale: string
-  }
+  }>
 }
 
 export async function generateMetadata({ params }: VerifyPageProps): Promise<Metadata> {
-  const t = await getTranslations({ locale: params.locale, namespace: 'verify' })
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'verify' })
 
   return {
     title: t('meta.title'),

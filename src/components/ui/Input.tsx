@@ -43,7 +43,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             h-11 w-full rounded-sm border-2 bg-white px-4 text-base text-ink
             transition-colors duration-fast
             placeholder:text-ink-400
-            focus:border-deepLagoon focus:outline-none focus:ring-3 focus:ring-deepLagoon-500/20
+            focus:border-deepLagoon focus:outline-none focus:ring-2 focus:ring-deepLagoon-500/20
             disabled:cursor-not-allowed disabled:bg-ink-50 disabled:text-ink-400
             ${hasError ? 'border-coral-600 focus:border-coral-600 focus:ring-coral-500/20' : 'border-ink-300'}
             ${hasSuccess ? 'border-seaGreen-500 focus:border-seaGreen-500 focus:ring-seaGreen-500/20' : ''}
