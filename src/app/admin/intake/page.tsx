@@ -2,6 +2,9 @@ import { prisma } from '@/lib/db/prisma'
 import { IntakeChecklist } from '@/components/admin/IntakeChecklist'
 import { IntakeSubmissions } from '@/components/admin/IntakeSubmissions'
 
+// Force dynamic rendering (don't generate at build time)
+export const dynamic = 'force-dynamic'
+
 export const metadata = {
   title: 'Campaign Facts Intake | Admin',
   description: 'Review and process campaign fact submissions',

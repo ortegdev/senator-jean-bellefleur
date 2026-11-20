@@ -6,6 +6,9 @@ import { ContributeFlow } from '@/components/contribute/ContributeFlow'
 import { InfoOnlyPanel } from '@/components/contribute/InfoOnlyPanel'
 import { WaitlistForm } from '@/components/contribute/WaitlistForm'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('contribute')
   return {

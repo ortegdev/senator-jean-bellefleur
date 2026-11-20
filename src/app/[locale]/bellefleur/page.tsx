@@ -12,6 +12,9 @@ import { ProfileFAQ } from '@/components/profile/ProfileFAQ'
 import { type Locale } from '@/i18n/config'
 import type { Metadata } from 'next'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 interface ProfilePageProps {
   params: Promise<{
     locale: Locale

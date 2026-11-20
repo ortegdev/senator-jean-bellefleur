@@ -7,6 +7,9 @@ import { getChecklistStatus } from '@/lib/launch-gate/checklist'
 import { getCurrentMode, isKillSwitchActive } from '@/lib/launch-gate/mode'
 import { getCandidateConfig } from '@/lib/config/candidate'
 
+// Force dynamic rendering (don't generate at build time)
+export const dynamic = 'force-dynamic'
+
 /**
  * Launch Control Admin Page
  * 

@@ -4,6 +4,9 @@ import { type Locale } from '@/i18n/config'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 
+// Force dynamic rendering (don't generate at build time)
+export const dynamic = 'force-dynamic'
+
 interface IssuesPageProps {
   params: Promise<{
     locale: Locale

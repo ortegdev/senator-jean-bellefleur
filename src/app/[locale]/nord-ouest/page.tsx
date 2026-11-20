@@ -6,6 +6,9 @@ import { SenateRaceBox } from '@/components/nord-ouest/SenateRaceBox'
 import { type Locale } from '@/i18n/config'
 import type { Metadata } from 'next'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 interface NordOuestPageProps {
   params: Promise<{
     locale: Locale

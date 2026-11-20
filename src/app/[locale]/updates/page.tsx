@@ -4,6 +4,9 @@ import { type Locale } from '@/i18n/config'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 interface UpdatesPageProps {
   params: Promise<{
     locale: Locale
