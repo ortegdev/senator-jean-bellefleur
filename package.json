@@ -17,7 +17,7 @@
     "audit:content": "tsx scripts/pre-launch-audit.ts",
     "lighthouse": "lhci autorun",
     "check:whatsapp": "tsx scripts/check-whatsapp-violations.ts",
-    "vercel:build": "npm run check:whatsapp && npm run build",
+    "vercel:build": "prisma migrate deploy && npm run check:whatsapp && npm run build",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:migrate:dev": "prisma migrate dev",
     "db:generate": "prisma generate",
