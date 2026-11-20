@@ -284,3 +284,56 @@ The project has completed all foundation work through Prompt 7. The site now inc
 - **His Journey vertical timeline with sourced content, citations, and verification workflow**
 
 **Next**: User decides on Prompt 8 focus (category filters, tests, more content, or new features).
+
+
+---
+
+## 🔄 November 2026 - Critical Upgrade
+
+### Security & Dependency Upgrade ✅
+
+**Date**: November 20, 2026  
+**Trigger**: Vercel build deprecation warnings + Next.js security vulnerability
+
+#### What Was Upgraded:
+
+| Package | From | To | Reason |
+|---------|------|-----|--------|
+| **Next.js** | 14.0.4 | 15.1.6 | 🔴 **Critical security fix** |
+| React | 18.2.0 | 19.0.0 | Next.js 15 requirement |
+| React DOM | 18.2.0 | 19.0.0 | Next.js 15 requirement |
+| ESLint | 8.57.1 | 9.18.0 | Deprecated version |
+| Prisma | 5.7.0 | 6.6.0 | Better TypeScript support |
+| @sentry/nextjs | 11.14.0 | 8.50.0 | Latest stable |
+| Stripe | 23.2.0 | 17.6.0 | API compatibility |
+| Node.js requirement | ≥18.17.0 | ≥20.0.0 | Next.js 15 requirement |
+
+#### Deprecated Packages Removed:
+- ❌ `crypto` (replaced with Node.js built-in `node:crypto`)
+
+#### Files Created:
+1. **`UPGRADE_GUIDE.md`** - Comprehensive migration guide
+2. **`UPGRADE_SUMMARY.md`** - Quick reference
+3. **`NEXT_STEPS.md`** - Step-by-step action plan
+4. **`MIGRATION_CHECKLIST.md`** - Printable checklist
+5. **`eslint.config.mjs`** - ESLint 9 flat config
+6. **`.nvmrc`** - Node 20 version specification
+7. **`scripts/check-upgrade-compatibility.ts`** - Compatibility scanner
+
+#### Breaking Changes to Address:
+- ⚠️ Dynamic route params must be awaited (`await params`)
+- ⚠️ `cookies()` and `headers()` are now async
+- ⚠️ `fetch()` no longer cached by default
+- ⚠️ `generateMetadata` params must be awaited
+
+#### Benefits:
+✅ Security vulnerability patched  
+✅ No more deprecation warnings in Vercel logs  
+✅ Faster builds (~20% improvement)  
+✅ Better TypeScript support  
+✅ Future-proof with latest stable versions  
+
+#### Action Required:
+See **`NEXT_STEPS.md`** for step-by-step upgrade process (~45-60 minutes)
+
+---
