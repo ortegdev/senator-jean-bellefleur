@@ -16,26 +16,27 @@ import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
   const response = NextResponse.next()
-  
-  // Use Web Crypto API (Edge Runtime compatible)
-  const nonceArray = new Uint8Array(16)
-  crypto.getRandomValues(nonceArray)
-  const nonce = Buffer.from(nonceArray).toString('base64')
 
   // ============================================================================
-  // Content Security Policy (Strict)
+  // Content Security Policy (Relaxed for Next.js 15)
+  // ============================================================================
+  // Note: Next.js 15 requires 'unsafe-inline' and 'unsafe-eval' for its
+  // inline scripts and dynamic imports. Proper nonce support would require
+  // passing the nonce to Next.js scripts, which is complex in App Router.
+  // TODO: Implement stricter CSP with nonce support when Next.js provides
+  // better CSP integration in App Router.
   // ============================================================================
   
   const cspDirectives = [
     // Default: only self
     "default-src 'self'",
     
-    // Scripts: nonce-based with unsafe-inline fallback for Next.js
-    // Modern browsers ignore 'unsafe-inline' when nonces are present
-    `script-src 'self' 'unsafe-inline' 'unsafe-eval' 'nonce-${nonce}' 'strict-dynamic'`,
+    // Scripts: Allow unsafe-inline and unsafe-eval for Next.js 15
+    // TODO: Implement proper nonce support in Next.js 15 App Router
+    `script-src 'self' 'unsafe-inline' 'unsafe-eval'`,
     
-    // Styles: nonce-based with unsafe-inline for Next.js styles
-    `style-src 'self' 'unsafe-inline' 'nonce-${nonce}'`,
+    // Styles: Allow unsafe-inline for Next.js styles
+    `style-src 'self' 'unsafe-inline'`,
     
     // Images: self + data URIs (for inline images) + external payment providers
     "img-src 'self' data: https://*.stripe.com https://*.paypal.com",
@@ -77,9 +78,6 @@ export function middleware(request: NextRequest) {
     'Content-Security-Policy',
     cspDirectives.join('; ')
   )
-
-  // Store nonce for use in pages
-  response.headers.set('X-CSP-Nonce', nonce)
 
   // ============================================================================
   // HTTP Strict Transport Security (HSTS)
