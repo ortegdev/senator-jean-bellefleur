@@ -30,11 +30,12 @@ export function middleware(request: NextRequest) {
     // Default: only self
     "default-src 'self'",
     
-    // Scripts: nonce-based, no unsafe-inline
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
+    // Scripts: nonce-based with unsafe-inline fallback for Next.js
+    // Modern browsers ignore 'unsafe-inline' when nonces are present
+    `script-src 'self' 'unsafe-inline' 'unsafe-eval' 'nonce-${nonce}' 'strict-dynamic'`,
     
-    // Styles: nonce-based for inline, external stylesheets from self
-    `style-src 'self' 'nonce-${nonce}'`,
+    // Styles: nonce-based with unsafe-inline for Next.js styles
+    `style-src 'self' 'unsafe-inline' 'nonce-${nonce}'`,
     
     // Images: self + data URIs (for inline images) + external payment providers
     "img-src 'self' data: https://*.stripe.com https://*.paypal.com",
