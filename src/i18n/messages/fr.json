@@ -1,0 +1,240 @@
+{
+  "common": {
+    "appName": "Diaspora4Bellefleur",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "close": "Fermer",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "save": "Enregistrer",
+    "back": "Retour",
+    "next": "Suivant",
+    "learnMore": "En savoir plus"
+  },
+  "candidate": {
+    "name": "Jean Fritznel Bellefleur",
+    "office": "Sénateur",
+    "department": "Nord-Ouest"
+  },
+  "nav": {
+    "home": "Accueil",
+    "about": "À propos",
+    "nordOuest": "Nord-Ouest",
+    "news": "Actualités",
+    "getInvolved": "S'impliquer",
+    "contribute": "Contribuer",
+    "contact": "Contact",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu"
+  },
+  "cta": {
+    "infoOnly": "En savoir plus",
+    "waitlist": "Recevoir les mises à jour",
+    "donationsLive": "Donner $5-$10"
+  },
+  "language": {
+    "switchLanguage": "Changer de langue",
+    "currentLanguage": "Français",
+    "selectLanguage": "Sélectionner la langue"
+  },
+  "affiliation": {
+    "independent": "Initiative de soutien indépendante, non autorisée par ou affiliée au candidat, sa campagne ou un parti",
+    "authorized": "Autorisé par {candidateName} pour Sénateur",
+    "coordinated": "Coordonné avec la campagne de {candidateName}"
+  },
+  "candidacyStatus": {
+    "unverified": "Statut de candidature : Non encore vérifié",
+    "registeredPreliminary": "Inscrit sur la liste préliminaire des candidats",
+    "onFinalList": "Confirmé sur le bulletin final",
+    "notOnFinalList": "Pas sur le bulletin final"
+  },
+  "footer": {
+    "sitemap": "Plan du site",
+    "legal": "Mentions légales",
+    "privacy": "Politique de confidentialité",
+    "terms": "Conditions d'utilisation",
+    "contact": "Contact",
+    "copyright": "© {year} {appName}. Tous droits réservés.",
+    "builtFor": "Construit pour la diaspora haïtienne soutenant {candidateName}",
+    "affiliation": "Affiliation"
+  },
+  "errors": {
+    "pageNotFound": "Page introuvable",
+    "pageNotFoundDescription": "La page que vous recherchez n'existe pas ou a été déplacée.",
+    "returnHome": "Retour à l'accueil",
+    "somethingWentWrong": "Une erreur s'est produite",
+    "errorDescription": "Une erreur inattendue s'est produite. Notre équipe a été notifiée.",
+    "tryAgain": "Réessayer",
+    "reload": "Recharger la page",
+    "maintenanceTitle": "Nous reviendrons bientôt",
+    "maintenanceDescription": "Nous effectuons une maintenance planifiée. Revenez bientôt.",
+    "givingPausedTitle": "Les dons sont en pause",
+    "givingPausedDescription": "Les contributions sont temporairement indisponibles. Merci de votre patience.",
+    "checkStatus": "Vérifier le statut"
+  },
+  "home": {
+    "hero": {
+      "title": "Soutenir {candidateName}",
+      "titleUnverified": "Une initiative de soutien pour {candidateName}",
+      "subtitle": "Une voix pour le Nord-Ouest",
+      "subtitleUnverified": "Effort indépendant soutenant sa candidature au Sénat",
+      "primaryCta": "En savoir plus",
+      "secondaryCta": "Comment ça marche"
+    },
+    "progress": {
+      "heading": "Nos Progrès",
+      "raised": "Collecté",
+      "supporters": "Supporteurs",
+      "countries": "Pays",
+      "communes": "Communes Représentées",
+      "ofGoal": "sur {goal} objectif",
+      "lastUpdated": "Mis à jour {time}"
+    },
+    "whyGifts": {
+      "heading": "Pourquoi les Petits Dons Comptent",
+      "description": "Les contributions individuelles construisent un pouvoir populaire indépendant des grands donateurs",
+      "card1Title": "Accessible à Tous",
+      "card1Body": "Les petits montants permettent aux membres de la diaspora n'importe où de participer de manière significative au soutien de la représentation du Nord-Ouest.",
+      "card2Title": "Indépendance",
+      "card2Body": "De nombreuses petites contributions réduisent la dépendance aux grands donateurs et aident à maintenir l'accent sur les besoins de la communauté.",
+      "card3Title": "Soutien Large",
+      "card3Body": "Une large base de contributeurs démontre un véritable soutien populaire à travers la diaspora et Haïti."
+    },
+    "rootsMap": {
+      "heading": "Racines dans le Nord-Ouest",
+      "description": "Origines des supporteurs par commune",
+      "noData": "Les données des contributeurs apparaîtront ici lorsqu'elles seront disponibles",
+      "supportersFrom": "{count} de {commune}"
+    },
+    "candidateTeaser": {
+      "heading": "À propos de {candidateName}",
+      "readProfile": "Lire le Profil Complet",
+      "placeholder": "Le profil du candidat arrive bientôt. Les informations seront sourcées et vérifiées avant publication."
+    },
+    "howItWorks": {
+      "heading": "Comment Ça Marche",
+      "step1Title": "Apprendre",
+      "step1Body": "Consultez les informations sur le candidat, toutes sourcées et vérifiées",
+      "step2Title": "Contribuer",
+      "step2Body": "Faites une contribution sécurisée quand les dons ouvrent",
+      "step3Title": "Restez Connecté",
+      "step3Body": "Recevez des mises à jour sur la campagne et votre impact"
+    },
+    "faq": {
+      "heading": "Questions Courantes",
+      "viewAll": "Voir Toutes les Questions",
+      "question1": "Est-ce la campagne officielle?",
+      "answer1": "Non. C'est une initiative de soutien indépendante. Voir notre divulgation d'affiliation ci-dessus.",
+      "question2": "Qui peut contribuer?",
+      "answer2": "L'éligibilité à contribuer dépend de la loi électorale haïtienne. Les détails seront disponibles avant l'ouverture des dons.",
+      "question3": "Comment l'argent est-il géré?",
+      "answer3": "Toutes les contributions sont traitées en toute sécurité par des fournisseurs de paiement établis. Aucune donnée de carte n'est stockée."
+    },
+    "signup": {
+      "headingInfoOnly": "Restez Informé",
+      "headingWaitlist": "Recevoir les Mises à Jour",
+      "headingDonationsLive": "Soutenez Aujourd'hui",
+      "descriptionInfoOnly": "En savoir plus sur la candidature et le Nord-Ouest",
+      "descriptionWaitlist": "Soyez notifié lorsque les fonctionnalités de contribution sont lancées",
+      "descriptionDonationsLive": "Rejoignez les supporteurs de la diaspora et d'Haïti",
+      "ctaInfoOnly": "En savoir plus sur {candidateName}",
+      "ctaWaitlist": "Rejoindre la Liste d'Attente",
+      "ctaDonationsLive": "Faire une Contribution"
+    }
+  },
+  "contribute": {
+    "disabled": "Les contributions ne sont pas disponibles pour le moment",
+    "title": "Faire une contribution",
+    "minimum": "Minimum",
+    "maximum": "Maximum"
+  },
+  "currency": {
+    "usd": "USD",
+    "approximate": "Environ {amount} {currency}",
+    "htg": "HTG",
+    "eur": "EUR",
+    "cad": "CAD"
+  },
+  "date": {
+    "format": {
+      "short": "{date, date, short}",
+      "medium": "{date, date, medium}",
+      "long": "{date, date, long}",
+      "full": "{date, date, full}"
+    }
+  },
+  "profile": {
+    "intro": {
+      "statusUnverified": "Statut de candidature : Non encore vérifié",
+      "statusPreliminary": "Inscrit sur la liste préliminaire des candidats",
+      "statusFinal": "Confirmé sur le bulletin final",
+      "statusNotOnList": "Pas sur le bulletin final",
+      "candidateFor": "Candidat pour {office} de {department}",
+      "description": "Ce profil contient uniquement des informations sourcées et vérifiées. Chaque fait inclut sa source et sa date de vérification.",
+      "sourcedTitle": "Tous les Faits Sont Sourcés",
+      "sourcedDescription": "Chaque affirmation sur cette page inclut une citation. Si une information ne peut pas être vérifiée, elle n'est pas affichée.",
+      "ctaSupport": "Soutenir Cette Candidature",
+      "ctaReportError": "Signaler une Erreur Factuelle"
+    },
+    "news": {
+      "heading": "Dans les Actualités",
+      "readMore": "Lire la suite",
+      "source": "Source",
+      "accessed": "Consulté le {date}",
+      "confidence": {
+        "confirmed": "Confirmé par plusieurs sources",
+        "singleSource": "Rapporté par {publisher}",
+        "disputedDate": "Date incertaine"
+      }
+    },
+    "journey": {
+      "heading": "Son Parcours",
+      "subtitle": "Étapes clés de son chemin vers le service public, documentées avec sources",
+      "biography": "Biographie",
+      "education": "Éducation",
+      "profession": "Expérience Professionnelle",
+      "publicService": "Service Public",
+      "noContent": "Les informations vérifiées apparaîtront ici dès qu'elles seront disponibles.",
+      "noEntries": "Les entrées de la chronologie apparaîtront au fur et à mesure que les faits seront vérifiés et sourcés.",
+      "sources": "Sources",
+      "viewSource": "Voir la source",
+      "accessed": "Consulté",
+      "dateUnknown": "Date incertaine",
+      "singleSourceNote": "Basé sur une seule source publiée",
+      "disputedDateNote": "La date est approximative ou contestée",
+      "verificationNote": "Toutes les entrées ont été vérifiées avec des sources citées",
+      "filterPlaceholder": "Filtres de catégorie à venir : Éducation • Carrière • Civique • Élections • Candidature",
+      "category": {
+        "all": "Tout",
+        "education": "Éducation",
+        "career": "Carrière",
+        "civic": "Civique",
+        "elections": "Élections",
+        "candidacy": "Candidature"
+      }
+    },
+    "supporter": {
+      "heading": "Perspective des Supporteurs",
+      "disclaimer": "Ce qui suit représente les opinions des supporteurs du site, et non des faits vérifiés sur le candidat.",
+      "whySupport": "Pourquoi Nous Soutenons Cette Candidature",
+      "value1Title": "Engagement envers le Nord-Ouest",
+      "value1Body": "Les supporteurs valorisent une représentation axée sur les besoins des 10 communes du département.",
+      "value2Title": "Connexion avec la Diaspora",
+      "value2Body": "La diaspora recherche des candidats qui comprennent à la fois Haïti et l'expérience de la diaspora.",
+      "value3Title": "Approche Transparente",
+      "value3Body": "Cette initiative valorise la transparence, l'information sourcée et la responsabilité.",
+      "notEndorsement": "Ceci n'est pas une approbation officielle et ne représente pas des citations du candidat ou de la campagne."
+    },
+    "faq": {
+      "heading": "Questions Fréquentes",
+      "noQuestions": "Les questions et réponses apparaîtront ici.",
+      "viewAllSources": "Voir toutes les sources pour cette réponse",
+      "hideAllSources": "Masquer les sources"
+    },
+    "reportError": {
+      "heading": "Signaler une Erreur Factuelle",
+      "description": "Si vous pensez qu'une information sur cette page est incorrecte, veuillez nous en informer.",
+      "emailLink": "Envoyez-nous un e-mail avec les détails et les preuves"
+    }
+  }
+}

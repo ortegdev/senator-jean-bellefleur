@@ -1,0 +1,516 @@
+{
+  "common": {
+    "appName": "Diaspora4Bellefleur",
+    "loading": "Loading...",
+    "error": "Error",
+    "close": "Close",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "back": "Back",
+    "next": "Next",
+    "learnMore": "Learn more"
+  },
+  "candidate": {
+    "name": "Jean Fritznel Bellefleur",
+    "office": "Senator",
+    "department": "Nord-Ouest"
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "nordOuest": "Nord-Ouest",
+    "news": "News",
+    "getInvolved": "Get Involved",
+    "contribute": "Contribute",
+    "contact": "Contact",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "cta": {
+    "infoOnly": "Learn more",
+    "waitlist": "Get launch updates",
+    "donationsLive": "Give $5-$10"
+  },
+  "language": {
+    "switchLanguage": "Switch language",
+    "currentLanguage": "English",
+    "selectLanguage": "Select language"
+  },
+  "affiliation": {
+    "independent": "Independent supporter initiative, not authorized by or affiliated with the candidate, his campaign or any party",
+    "authorized": "Authorized by {candidateName} for Senator",
+    "coordinated": "Coordinated with {candidateName} campaign"
+  },
+  "candidacyStatus": {
+    "unverified": "Candidacy status: Not yet verified",
+    "registeredPreliminary": "Registered on preliminary candidate list",
+    "onFinalList": "Confirmed on final ballot",
+    "notOnFinalList": "Not on final ballot"
+  },
+  "verify": {
+    "meta": {
+      "title": "Verify This Site | Diaspora4Bellefleur",
+      "description": "Verify the authenticity of this website and email communications"
+    },
+    "title": "Verify This Site",
+    "description": "Protect yourself from fraud and phishing by verifying you're on the official site.",
+    "warning": {
+      "title": "Only Give at the Official Domain",
+      "message": "Scammers may create fake websites that look similar. Always verify the domain before making a contribution.",
+      "officialDomain": "Official domain"
+    },
+    "domain": {
+      "title": "Official Website Domain",
+      "description": "This is the only legitimate domain for this initiative. Any other domain is not affiliated with us.",
+      "officialUrl": "Official URL",
+      "browserCheck": "How to check in your browser",
+      "browserCheckDescription": "Your browser's address bar should show:",
+      "checkUrl": "The exact URL above",
+      "checkCertificate": "A lock icon indicating secure HTTPS",
+      "checkNoWarnings": "No security warnings"
+    },
+    "email": {
+      "title": "Official Email Communications",
+      "description": "We will only send emails from addresses using this domain.",
+      "officialDomain": "Official email domain",
+      "supportAddress": "Support email address",
+      "authentication": {
+        "title": "Email Authentication",
+        "description": "Our emails are authenticated with SPF, DKIM, and DMARC. Technical users can verify:",
+        "spf": "SPF record verifies our mail servers are authorized",
+        "dkim": "DKIM signature proves email hasn't been tampered with",
+        "dmarc": "DMARC policy instructs email providers how to handle our emails"
+      }
+    },
+    "social": {
+      "title": "Official Social Media",
+      "description": "These are our only official social media accounts. Any others are not affiliated with us."
+    },
+    "redFlags": {
+      "title": "Red Flags: Signs of a Scam",
+      "description": "Be suspicious of:",
+      "wrongDomain": "Different domain or misspelled URLs",
+      "unsecureHttp": "HTTP instead of HTTPS (no lock icon)",
+      "wrongEmail": "Emails from free services (gmail, yahoo, etc.) or wrong domain",
+      "urgentRequests": "Urgent demands for immediate action",
+      "personalInfo": "Requests for sensitive personal information"
+    },
+    "report": {
+      "description": "If you've encountered a suspicious website, email, or social media account claiming to represent us:",
+      "button": "Report Suspicious Activity"
+    }
+  },
+  "footer": {
+    "sitemap": "Sitemap",
+    "legal": "Legal",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Use",
+    "contact": "Contact",
+    "copyright": "© {year} {appName}. All rights reserved.",
+    "builtFor": "Built for the Haitian diaspora supporting {candidateName}",
+    "affiliation": "Affiliation"
+  },
+  "errors": {
+    "pageNotFound": "Page not found",
+    "pageNotFoundDescription": "The page you're looking for doesn't exist or has been moved.",
+    "returnHome": "Return to home",
+    "somethingWentWrong": "Something went wrong",
+    "errorDescription": "An unexpected error occurred. Our team has been notified.",
+    "tryAgain": "Try again",
+    "reload": "Reload page",
+    "maintenanceTitle": "We'll be right back",
+    "maintenanceDescription": "We're performing scheduled maintenance. Check back soon.",
+    "givingPausedTitle": "Giving is paused",
+    "givingPausedDescription": "Contributions are temporarily unavailable. Thank you for your patience.",
+    "checkStatus": "Check status"
+  },
+  "home": {
+    "hero": {
+      "title": "Support {candidateName}",
+      "titleUnverified": "A supporter initiative for {candidateName}",
+      "subtitle": "A voice for Nord-Ouest",
+      "subtitleUnverified": "Independent effort supporting his candidacy for Senator",
+      "primaryCta": "Learn More",
+      "secondaryCta": "How It Works"
+    },
+    "progress": {
+      "heading": "Our Progress",
+      "raised": "Raised",
+      "supporters": "Supporters",
+      "countries": "Countries",
+      "communes": "Communes Represented",
+      "ofGoal": "of {goal} goal",
+      "lastUpdated": "Updated {time}"
+    },
+    "whyGifts": {
+      "heading": "Why Small Gifts Matter",
+      "description": "Individual contributions build grassroots power independent of large donors",
+      "card1Title": "Accessible to All",
+      "card1Body": "Small amounts allow diaspora members anywhere to participate meaningfully in supporting representation for Nord-Ouest.",
+      "card2Title": "Independence",
+      "card2Body": "Many small contributions reduce reliance on large donors and help maintain focus on community needs.",
+      "card3Title": "Broad Support",
+      "card3Body": "A wide base of contributors demonstrates genuine grassroots backing across the diaspora and Haiti."
+    },
+    "rootsMap": {
+      "heading": "Roots in Nord-Ouest",
+      "description": "Supporter origins by commune",
+      "noData": "Contributor data will appear here when available",
+      "supportersFrom": "{count} from {commune}"
+    },
+    "candidateTeaser": {
+      "heading": "About {candidateName}",
+      "readProfile": "Read Full Profile",
+      "placeholder": "Candidate profile coming soon. Information will be sourced and verified before publication."
+    },
+    "howItWorks": {
+      "heading": "How It Works",
+      "step1Title": "Learn",
+      "step1Body": "Review candidate information, all sourced and verified",
+      "step2Title": "Contribute",
+      "step2Body": "Make a secure contribution when giving opens",
+      "step3Title": "Stay Connected",
+      "step3Body": "Get updates on the campaign and your impact"
+    },
+    "faq": {
+      "heading": "Common Questions",
+      "viewAll": "View All Questions",
+      "question1": "Is this the official campaign?",
+      "answer1": "No. This is an independent supporter initiative. See our affiliation disclosure above.",
+      "question2": "Who can contribute?",
+      "answer2": "Contribution eligibility depends on Haitian election law. Details will be available before giving opens.",
+      "question3": "How is money handled?",
+      "answer3": "All contributions are processed securely through established payment providers. No card data is stored."
+    },
+    "signup": {
+      "headingInfoOnly": "Stay Informed",
+      "headingWaitlist": "Get Launch Updates",
+      "headingDonationsLive": "Support Today",
+      "descriptionInfoOnly": "Learn more about the candidacy and Nord-Ouest",
+      "descriptionWaitlist": "Be notified when contribution features launch",
+      "descriptionDonationsLive": "Join supporters from the diaspora and Haiti",
+      "ctaInfoOnly": "Learn More About {candidateName}",
+      "ctaWaitlist": "Join the Waitlist",
+      "ctaDonationsLive": "Make a Contribution"
+    }
+  },
+  "contribute": {
+    "pageTitle": "Support Jean Fritznel Bellefleur",
+    "pageDescription": "Make a small-dollar contribution to support Jean Fritznel Bellefleur's candidacy for Senator of Nord-Ouest",
+    "backToHome": "Back to home",
+    "back": "Back",
+    "securePayment": "Secure payment",
+    "steps": {
+      "progressLabel": "Contribution progress",
+      "amount": "Amount",
+      "details": "Your details",
+      "payment": "Payment"
+    },
+    "infoOnly": {
+      "title": "Contributions Not Yet Available",
+      "description": "Thank you for your interest in supporting {candidateName}. This platform is not yet accepting contributions.",
+      "statusHeading": "Current Status",
+      "statusMessage": "We are preparing to launch contributions in full compliance with Haitian election law and US regulations. Check back soon for updates.",
+      "learnMoreHeading": "Learn more about this initiative:",
+      "linkProfile": "About Jean Fritznel Bellefleur",
+      "linkDepartment": "Learn about Nord-Ouest",
+      "linkIssues": "Explore key issues"
+    },
+    "waitlist": {
+      "title": "Get Launch Updates",
+      "description": "Be notified when contributions for {candidateName} become available. We respect your privacy and will only contact you about this initiative.",
+      "emailLabel": "Email address",
+      "emailPlaceholder": "your@email.com",
+      "emailConsent": "I agree to receive email updates about this initiative. I can unsubscribe at any time.",
+      "whatsappLabel": "WhatsApp number (optional)",
+      "whatsappPlaceholder": "+1 XXX XXX XXXX",
+      "whatsappConsent": "I agree to receive WhatsApp updates about this initiative.",
+      "submit": "Sign up",
+      "submitting": "Signing up...",
+      "successTitle": "You're on the list!",
+      "successMessage": "We'll notify you as soon as contributions become available. Thank you for your support.",
+      "errorNoContact": "Please provide an email or WhatsApp number",
+      "errorEmailConsent": "Please agree to email updates if providing an email",
+      "errorWhatsappConsent": "Please agree to WhatsApp updates if providing a number",
+      "errorGeneric": "Something went wrong. Please try again."
+    },
+    "amount": {
+      "title": "Support {candidateName}",
+      "valueProposition": "Small contributions from diaspora members build grassroots power. Every contribution between {min} and {max} helps represent Nord-Ouest with independence and integrity.",
+      "selectAmount": "Select an amount",
+      "customAmount": "Or enter a custom amount",
+      "rangeNote": "Contributions limited to {min}–{max} per supporter",
+      "continue": "Continue",
+      "trustNote": "Secure, encrypted payment processing",
+      "errorInvalidAmount": "Please enter a valid amount",
+      "errorNoAmount": "Please select or enter an amount",
+      "errorOutOfRange": "Contributions are limited to {min}–{max} per supporter"
+    },
+    "details": {
+      "title": "Your Details",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email address",
+      "country": "Country of residence",
+      "countryPlaceholder": "e.g., United States, Canada, Haiti",
+      "communeOfOrigin": "Commune of origin in Nord-Ouest",
+      "communeSelect": "Select a commune (optional)",
+      "communeNote": "Your roots help us show diaspora connections on our map",
+      "preferredLanguage": "Preferred language",
+      "attestationsHeading": "Eligibility confirmations",
+      "attestationAge": "I confirm that I am at least 18 years old",
+      "attestationLegal": "I confirm that this contribution complies with applicable election laws in my country of residence",
+      "attestationForeignAgent": "I understand that this is an independent initiative and not an official campaign",
+      "anonymousToggle": "Keep my name anonymous on public supporter wall",
+      "anonymousNote": "Your information remains private and will not be shared publicly",
+      "dedication": "Optional dedication or message",
+      "dedicationPlaceholder": "In honor of...",
+      "optional": "(optional)",
+      "continue": "Continue to payment",
+      "errorRequired": "This field is required",
+      "errorInvalidEmail": "Please enter a valid email address",
+      "errorAttestation": "All confirmations are required to continue"
+    },
+    "payment": {
+      "title": "Payment",
+      "contribution": "Contribution",
+      "to": "To",
+      "walletHeading": "Quick payment",
+      "applePayButton": "Pay with Apple Pay",
+      "googlePayButton": "Pay with Google Pay",
+      "orPayWithCard": "Or pay with card",
+      "cardFieldsPlaceholder": "Payment provider card fields will appear here",
+      "providerHostedNote": "Card details are processed securely by our payment provider. We never see or store your card information.",
+      "payButton": "Pay {amount}",
+      "payNow": "Pay now",
+      "processing": "Processing...",
+      "total": "Total",
+      "securePaymentNote": "256-bit SSL encrypted payment",
+      "refundPolicyLink": "View refund policy",
+      "notTaxDeductible": "Contributions are not tax-deductible",
+      "secure3DTitle": "Verifying your payment",
+      "secure3DMessage": "Your bank is verifying this transaction for your security. This may take a moment.",
+      "errorTitle": "Payment failed",
+      "errorPaymentFailed": "Your payment could not be processed. Please try again or use a different payment method.",
+      "errorGeneric": "Something went wrong. Please try again.",
+      "tryAgain": "Try again"
+    },
+    "success": {
+      "title": "Thank You!",
+      "message": "Thank you, {firstName}! Your {amount} contribution makes a difference.",
+      "receiptNotice": "A receipt has been sent to {email}",
+      "shareHeading": "Invite Three Friends",
+      "shareDescription": "Help grow this grassroots effort by sharing with friends and family who care about Nord-Ouest representation.",
+      "shareWhatsApp": "Share on WhatsApp",
+      "shareFacebook": "Share on Facebook",
+      "shareTwitter": "Share on Twitter",
+      "shareText": "I just supported {candidateName} for Senator of Nord-Ouest with a {amount} contribution. Join me in building grassroots power for our community.",
+      "rootsPromptHeading": "Your roots in {commune}",
+      "rootsPromptMessage": "See other supporters with connections to your commune on our interactive map.",
+      "viewMap": "View roots map",
+      "nextStepsHeading": "What's next?",
+      "nextStepProfile": "Learn more about Jean Fritznel Bellefleur",
+      "nextStepProfileDesc": "Read his background, experience, and vision",
+      "nextStepUpdates": "Follow campaign updates",
+      "nextStepUpdatesDesc": "Stay informed about progress and milestones",
+      "nextStepHome": "Return to home",
+      "nextStepHomeDesc": "Explore the full platform"
+    }
+  },
+  "currency": {
+    "usd": "USD",
+    "approximate": "Approximately {amount} {currency}",
+    "htg": "HTG",
+    "eur": "EUR",
+    "cad": "CAD"
+  },
+  "date": {
+    "format": {
+      "short": "{date, date, short}",
+      "medium": "{date, date, medium}",
+      "long": "{date, date, long}",
+      "full": "{date, date, full}"
+    }
+  },
+  "updates": {
+    "meta": {
+      "title": "Campaign Updates",
+      "description": "Latest news and announcements"
+    },
+    "heading": "Campaign Updates",
+    "description": "Stay informed with the latest news, announcements, and campaign milestones.",
+    "emptyState": {
+      "heading": "No Updates Yet",
+      "description": "Campaign updates will appear here once published."
+    },
+    "pinned": "Pinned",
+    "readMore": "Read More"
+  },
+  "news": {
+    "heading": "In the News",
+    "framingText": "Third-party news coverage mentioning Jean Fritznel Bellefleur. We link to articles we discover through news monitoring; we do not endorse, verify, or control their content.",
+    "howWeChoose": {
+      "heading": "How We Choose Coverage",
+      "paragraph1": "We use automated news monitoring to discover articles mentioning Jean Fritznel Bellefleur from Haitian and international news sources. Articles are included based on relevance only—not tone or favorability.",
+      "paragraph2": "Critical coverage, opinion pieces, and neutral reporting all appear here. We moderate only for accuracy (removing namesakes or duplicates) and basic quality (removing spam or broken links).",
+      "paragraph3": "Discovery is partly powered by the GDELT Project, a global news monitoring initiative.",
+      "suggestArticle": "Suggest an article we missed",
+      "reportError": "Report an error or namesake",
+      "requestRemoval": "Request removal (publishers only)",
+      "gdeltNote": "Powered in part by"
+    },
+    "ticker": {
+      "ariaLabel": "Latest news coverage",
+      "breaking": "Breaking",
+      "new": "New",
+      "latestCoverage": "Latest coverage",
+      "of": "of",
+      "previous": "Previous article",
+      "next": "Next article",
+      "pause": "Pause rotation",
+      "play": "Resume rotation",
+      "goToSlide": "Go to article",
+      "opinion": "Opinion"
+    }
+  },
+  "issues": {
+    "meta": {
+      "title": "Issues & Positions",
+      "description": "Policy positions and issue stances"
+    },
+    "heading": "Issues & Positions",
+    "description": "Positions on key issues facing Nord-Ouest and Haiti. Content marked as supporter summaries are based on public statements and require source verification.",
+    "emptyState": {
+      "heading": "No Issues Published Yet",
+      "description": "Issue positions will appear here once they are drafted, sourced, and approved."
+    },
+    "supporterSummary": "Supporter Summary",
+    "officialPosition": "Official Position",
+    "sourceCount": "{count, plural, =1 {1 source} other {# sources}}",
+    "readMore": "Read More",
+    "backToIssues": "Back to Issues",
+    "supporterSummaryLabel": "Supporter Summary Based on Public Statements",
+    "supporterSummaryNote": "This position is attributed to the candidate and requires source verification.",
+    "officialPositionLabel": "Campaign-Approved Position",
+    "sources": "Sources"
+  },
+  "nordOuest": {
+    "meta": {
+      "title": "Nord-Ouest Department - Haiti",
+      "description": "Learn about the Nord-Ouest department of Haiti, its 10 communes, and the Senate race."
+    },
+    "hero": {
+      "title": "Nord-Ouest Department",
+      "subtitle": "Ten communes across three arrondissements",
+      "communes": "Communes",
+      "arrondissements": "Arrondissements",
+      "population": "Population",
+      "populationNote": "2015 estimate"
+    },
+    "intro": {
+      "paragraph1": "Nord-Ouest is one of Haiti's ten departments, with its capital in Port-de-Paix. The department is organized into three arrondissements (Môle-Saint-Nicolas, Port-de-Paix, and Saint-Louis-du-Nord) and ten communes.",
+      "paragraph2": "The estimated 2015 population was 728,807 according to IHSI data. Each commune has its own character and contributes to the department's identity."
+    },
+    "senateRace": {
+      "heading": "About the Senate Race",
+      "firstRound": "First Round",
+      "secondRound": "Second Round",
+      "campaignStart": "Official Campaign Period Begins",
+      "reportedDates": "Reported Dates - Verification Required",
+      "reportedDatesNote": "These dates are from CEP calendar reported October 28, 2026. They should be verified against official CEP decree.",
+      "noDates": "Election dates will be displayed here once verified.",
+      "seatsNote": "The number of Senate seats for Nord-Ouest has not been verified and is not stated here."
+    },
+    "communeIndex": {
+      "heading": "The 10 Communes",
+      "description": "Explore each commune of Nord-Ouest. Supporter counts shown where available.",
+      "arrondissementOf": "Arrondissement of",
+      "supporters": "Supporters",
+      "population": "Population",
+      "noData": "Data coming soon"
+    },
+    "sources": {
+      "heading": "Sources",
+      "population": "Population data",
+      "citingIHSI": "citing IHSI 2015 estimate",
+      "calendar": "Election calendar",
+      "calendarNote": "CEP calendar as reported October 28, 2026 - requires verification",
+      "verificationNote": "All facts on this page are sourced. Population figures should be verified against official IHSI data."
+    }
+  },
+  "profile": {
+    "intro": {
+      "statusUnverified": "Candidacy status: Not yet verified",
+      "statusPreliminary": "Registered on preliminary candidate list",
+      "statusFinal": "Confirmed on final ballot",
+      "statusNotOnList": "Not on final ballot",
+      "candidateFor": "Candidate for {office} of {department}",
+      "description": "This profile contains only sourced, verified information. Each fact includes its source and verification date.",
+      "sourcedTitle": "All Facts Are Sourced",
+      "sourcedDescription": "Every claim on this page includes a citation. If information cannot be verified, it is not displayed.",
+      "ctaSupport": "Support This Candidacy",
+      "ctaReportError": "Report a Factual Error"
+    },
+    "news": {
+      "heading": "In the News",
+      "readMore": "Read more",
+      "source": "Source",
+      "accessed": "Accessed {date}",
+      "confidence": {
+        "confirmed": "Confirmed by multiple sources",
+        "singleSource": "Reported by {publisher}",
+        "disputedDate": "Date uncertain"
+      }
+    },
+    "journey": {
+      "heading": "His Journey",
+      "subtitle": "Key milestones in his path to public service, documented with sources",
+      "biography": "Biography",
+      "education": "Education",
+      "profession": "Professional Experience",
+      "publicService": "Public Service",
+      "noContent": "Verified information will appear here as it becomes available.",
+      "noEntries": "Timeline entries will appear as facts are verified and sourced.",
+      "sources": "Sources",
+      "viewSource": "View source",
+      "accessed": "Accessed",
+      "dateUnknown": "Date uncertain",
+      "singleSourceNote": "Based on a single published source",
+      "disputedDateNote": "Date is approximate or disputed",
+      "verificationNote": "All entries have been verified with cited sources",
+      "filterPlaceholder": "Category filters coming soon: Education • Career • Civic • Elections • Candidacy",
+      "category": {
+        "all": "All",
+        "education": "Education",
+        "career": "Career",
+        "civic": "Civic",
+        "elections": "Elections",
+        "candidacy": "Candidacy"
+      }
+    },
+    "supporter": {
+      "heading": "Supporter Perspective",
+      "disclaimer": "The following represents the views of site supporters, not verified facts about the candidate.",
+      "whySupport": "Why We Support This Candidacy",
+      "value1Title": "Commitment to Nord-Ouest",
+      "value1Body": "Supporters value representation focused on the needs of all 10 communes in the department.",
+      "value2Title": "Diaspora Connection",
+      "value2Body": "The diaspora seeks candidates who understand both Haiti and the diaspora experience.",
+      "value3Title": "Transparent Approach",
+      "value3Body": "This initiative values transparency, sourced information, and accountability.",
+      "notEndorsement": "This is not an official endorsement and does not represent quotes from the candidate or campaign."
+    },
+    "faq": {
+      "heading": "Frequently Asked Questions",
+      "noQuestions": "Questions and answers will appear here.",
+      "viewAllSources": "View all sources for this answer",
+      "hideAllSources": "Hide sources"
+    },
+    "reportError": {
+      "heading": "Report a Factual Error",
+      "description": "If you believe any information on this page is incorrect, please let us know.",
+      "emailLink": "Email us with details and evidence"
+    }
+  }
+}

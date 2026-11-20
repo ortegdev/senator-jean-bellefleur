@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Typography */
+  html {
+    @apply antialiased;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  body {
+    @apply bg-sandPaper text-ink;
+    font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+  }
+
+  /* Headings use Fraunces display font */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display font-bold;
+    line-height: 1.2;
+  }
+
+  /* Optimal line length for readability */
+  p {
+    max-width: 70ch;
+  }
+
+  /* Focus visible styles */
+  *:focus-visible {
+    @apply outline-none ring-3 ring-deepLagoon-500 ring-offset-2 ring-offset-sandPaper;
+  }
+
+  /* Skip to main content link */
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50;
+    @apply bg-white px-4 py-2 text-ink shadow-lg;
+  }
+}
+
+/* Motion tokens with prefers-reduced-motion support */
+@layer utilities {
+  :root {
+    --motion-duration-fast: 120ms;
+    --motion-duration-base: 200ms;
+    --motion-duration-slow: 300ms;
+    --motion-easing: cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --motion-duration-fast: 0ms;
+      --motion-duration-base: 0ms;
+      --motion-duration-slow: 0ms;
+    }
+    
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* Transition utilities using motion tokens */
+  .transition-fast {
+    transition-duration: var(--motion-duration-fast);
+    transition-timing-function: var(--motion-easing);
+  }
+
+  .transition-base {
+    transition-duration: var(--motion-duration-base);
+    transition-timing-function: var(--motion-easing);
+  }
+
+  .transition-slow {
+    transition-duration: var(--motion-duration-slow);
+    transition-timing-function: var(--motion-easing);
+  }
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .dark {
+    /* Dark mode overrides */
+    --color-bg: theme('colors.ink.900');
+    --color-text: theme('colors.sandPaper.100');
+  }
+}
+
+/* Print styles */
+@media print {
+  body {
+    @apply bg-white text-black;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}

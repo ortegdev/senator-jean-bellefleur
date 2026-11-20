@@ -1,0 +1,35 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-11-18",
+  "locales": {
+    "en": {
+      "status": "complete",
+      "nativeReviewed": true,
+      "reviewer": "Native English speaker",
+      "reviewDate": "2026-11-18"
+    },
+    "fr": {
+      "status": "machine-drafted",
+      "nativeReviewed": false,
+      "notes": "All strings machine-translated, require native French speaker review",
+      "priorityKeys": [
+        "affiliation.independent",
+        "candidacyStatus.*",
+        "cta.*",
+        "errors.*"
+      ]
+    },
+    "ht": {
+      "status": "machine-drafted",
+      "nativeReviewed": false,
+      "notes": "All strings machine-translated, require native Haitian Creole speaker review",
+      "priorityKeys": [
+        "affiliation.independent",
+        "candidacyStatus.*",
+        "cta.*",
+        "errors.*"
+      ]
+    }
+  },
+  "notes": "Machine-drafted translations (fr, ht) are functional but should be reviewed by native speakers before launch. Priority keys are those visible on every page or related to legal compliance."
+}

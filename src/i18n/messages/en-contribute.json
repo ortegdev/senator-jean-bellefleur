@@ -1,0 +1,133 @@
+{
+  "contribute": {
+    "pageTitle": "Support Jean Fritznel Bellefleur",
+    "pageDescription": "Make a small-dollar contribution to support Jean Fritznel Bellefleur's candidacy for Senator of Nord-Ouest",
+    "backToHome": "Back to home",
+    "back": "Back",
+    "securePayment": "Secure payment",
+    
+    "steps": {
+      "progressLabel": "Contribution progress",
+      "amount": "Amount",
+      "details": "Your details",
+      "payment": "Payment"
+    },
+
+    "infoOnly": {
+      "title": "Contributions Not Yet Available",
+      "description": "Thank you for your interest in supporting {candidateName}. This platform is not yet accepting contributions.",
+      "statusHeading": "Current Status",
+      "statusMessage": "We are preparing to launch contributions in full compliance with Haitian election law and US regulations. Check back soon for updates.",
+      "learnMoreHeading": "Learn more about this initiative:",
+      "linkProfile": "About Jean Fritznel Bellefleur",
+      "linkDepartment": "Learn about Nord-Ouest",
+      "linkIssues": "Explore key issues"
+    },
+
+    "waitlist": {
+      "title": "Get Launch Updates",
+      "description": "Be notified when contributions for {candidateName} become available. We respect your privacy and will only contact you about this initiative.",
+      "emailLabel": "Email address",
+      "emailPlaceholder": "your@email.com",
+      "emailConsent": "I agree to receive email updates about this initiative. I can unsubscribe at any time.",
+      "whatsappLabel": "WhatsApp number (optional)",
+      "whatsappPlaceholder": "+1 XXX XXX XXXX",
+      "whatsappConsent": "I agree to receive WhatsApp updates about this initiative.",
+      "submit": "Sign up",
+      "submitting": "Signing up...",
+      "successTitle": "You're on the list!",
+      "successMessage": "We'll notify you as soon as contributions become available. Thank you for your support.",
+      "errorNoContact": "Please provide an email or WhatsApp number",
+      "errorEmailConsent": "Please agree to email updates if providing an email",
+      "errorWhatsappConsent": "Please agree to WhatsApp updates if providing a number",
+      "errorGeneric": "Something went wrong. Please try again."
+    },
+
+    "amount": {
+      "title": "Support {candidateName}",
+      "valueProposition": "Small contributions from diaspora members build grassroots power. Every contribution between {min} and {max} helps represent Nord-Ouest with independence and integrity.",
+      "selectAmount": "Select an amount",
+      "customAmount": "Or enter a custom amount",
+      "rangeNote": "Contributions limited to {min}–{max} per supporter",
+      "continue": "Continue",
+      "trustNote": "Secure, encrypted payment processing",
+      "errorInvalidAmount": "Please enter a valid amount",
+      "errorNoAmount": "Please select or enter an amount",
+      "errorOutOfRange": "Contributions are limited to {min}–{max} per supporter"
+    },
+
+    "details": {
+      "title": "Your Details",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email address",
+      "country": "Country of residence",
+      "countryPlaceholder": "e.g., United States, Canada, Haiti",
+      "communeOfOrigin": "Commune of origin in Nord-Ouest",
+      "communeSelect": "Select a commune (optional)",
+      "communeNote": "Your roots help us show diaspora connections on our map",
+      "preferredLanguage": "Preferred language",
+      "attestationsHeading": "Eligibility confirmations",
+      "attestationAge": "I confirm that I am at least 18 years old",
+      "attestationLegal": "I confirm that this contribution complies with applicable election laws in my country of residence",
+      "attestationForeignAgent": "I understand that this is an independent initiative and not an official campaign",
+      "anonymousToggle": "Keep my name anonymous on public supporter wall",
+      "anonymousNote": "Your information remains private and will not be shared publicly",
+      "dedication": "Optional dedication or message",
+      "dedicationPlaceholder": "In honor of...",
+      "optional": "(optional)",
+      "continue": "Continue to payment",
+      "errorRequired": "This field is required",
+      "errorInvalidEmail": "Please enter a valid email address",
+      "errorAttestation": "All confirmations are required to continue"
+    },
+
+    "payment": {
+      "title": "Payment",
+      "contribution": "Contribution",
+      "to": "To",
+      "walletHeading": "Quick payment",
+      "applePayButton": "Pay with Apple Pay",
+      "googlePayButton": "Pay with Google Pay",
+      "orPayWithCard": "Or pay with card",
+      "cardFieldsPlaceholder": "Payment provider card fields will appear here",
+      "providerHostedNote": "Card details are processed securely by our payment provider. We never see or store your card information.",
+      "payButton": "Pay {amount}",
+      "payNow": "Pay now",
+      "processing": "Processing...",
+      "total": "Total",
+      "back": "Back",
+      "securePaymentNote": "256-bit SSL encrypted payment",
+      "refundPolicyLink": "View refund policy",
+      "notTaxDeductible": "Contributions are not tax-deductible",
+      "secure3DTitle": "Verifying your payment",
+      "secure3DMessage": "Your bank is verifying this transaction for your security. This may take a moment.",
+      "errorTitle": "Payment failed",
+      "errorPaymentFailed": "Your payment could not be processed. Please try again or use a different payment method.",
+      "errorGeneric": "Something went wrong. Please try again.",
+      "tryAgain": "Try again"
+    },
+
+    "success": {
+      "title": "Thank You!",
+      "message": "Thank you, {firstName}! Your {amount} contribution makes a difference.",
+      "receiptNotice": "A receipt has been sent to {email}",
+      "shareHeading": "Invite Three Friends",
+      "shareDescription": "Help grow this grassroots effort by sharing with friends and family who care about Nord-Ouest representation.",
+      "shareWhatsApp": "Share on WhatsApp",
+      "shareFacebook": "Share on Facebook",
+      "shareTwitter": "Share on Twitter",
+      "shareText": "I just supported {candidateName} for Senator of Nord-Ouest with a {amount} contribution. Join me in building grassroots power for our community.",
+      "rootsPromptHeading": "Your roots in {commune}",
+      "rootsPromptMessage": "See other supporters with connections to your commune on our interactive map.",
+      "viewMap": "View roots map",
+      "nextStepsHeading": "What's next?",
+      "nextStepProfile": "Learn more about Jean Fritznel Bellefleur",
+      "nextStepProfileDesc": "Read his background, experience, and vision",
+      "nextStepUpdates": "Follow campaign updates",
+      "nextStepUpdatesDesc": "Stay informed about progress and milestones",
+      "nextStepHome": "Return to home",
+      "nextStepHomeDesc": "Explore the full platform"
+    }
+  }
+}

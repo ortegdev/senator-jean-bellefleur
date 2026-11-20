@@ -1,0 +1,4094 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// CANDIDATE CONFIGURATION (Single Source of Truth)
+model CandidateConfig {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Identity
+  slug          String            @unique
+  candidateName String
+  office        ElectoralOffice
+  department    String
+  communes      String[] // Array of commune names
+  party         String? // Nullable, may be unknown
+
+  // Candidacy Status
+  candidacyStatus         CandidacyStatus @default(UNVERIFIED)
+  candidacyStatusSource   String? // Evidence/source for status
+  candidacyStatusDate     DateTime? // When status was verified
+  candidacyStatusVerifier String? // Who verified (name/role)
+  candidacyEvidenceUrl    String? // Document upload URL
+
+  // Campaign Dates
+  officialCampaignStart DateTime?
+  firstRoundDate        DateTime?
+  firstRoundDateNote    String? // e.g., "per CEP calendar reported Oct 28, 2026; verify"
+  secondRoundDate       DateTime?
+  secondRoundDateNote   String?
+
+  // Contribution Limits (in cents)
+  minAmountCents       Int
+  maxAmountCents       Int
+  cumulativeCapCents   Int
+  fundraisingGoalCents Int?
+
+  // Contact & Domain
+  domain       String?
+  supportEmail String
+  photoUrl     String? // Approved candidate photo URL
+
+  // Localization
+  defaultLocale String @default("ht")
+
+  // Affiliation Disclosure
+  affiliationStatus      AffiliationStatus @default(INDEPENDENT)
+  affiliationText        String            @default("independent supporter initiative, not authorized by or affiliated with the candidate, his campaign or any party")
+  affiliationAgreementRef String? // Reference to authorization agreement
+  affiliationAgreementDate DateTime? // Date of authorization
+
+  // Versioning for audit trail
+  version Int @default(1)
+
+  @@index([slug])
+}
+
+enum ElectoralOffice {
+  SENATOR
+  DEPUTY
+  PRESIDENT
+  MAYOR
+  OTHER
+}
+
+enum CandidacyStatus {
+  UNVERIFIED
+  REGISTERED_PRELIMINARY
+  ON_FINAL_LIST
+  NOT_ON_FINAL_LIST
+}
+
+enum AffiliationStatus {
+  INDEPENDENT
+  AUTHORIZED
+  COORDINATED
+}
+
+// LAUNCH GATE CONFIGURATION
+model LaunchGate {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Current Mode
+  mode LaunchMode @default(INFO_ONLY)
+  
+  // Mode change audit
+  modeChangedBy   String? // User ID/email who changed it
+  modeChangedAt   DateTime? // When it was changed
+  modeChangeReason String? @db.Text // Why it was changed
+  
+  // Kill switch
+  killSwitchActive Boolean @default(false)
+  killSwitchReason String? @db.Text
+  killSwitchBy     String?
+  killSwitchAt     DateTime?
+
+  // Singleton pattern - only one record
+  @@index([mode])
+}
+
+enum LaunchMode {
+  INFO_ONLY      // No payments, no data collection
+  WAITLIST       // Email/WhatsApp signup, no payments
+  DONATIONS_LIVE // Full functionality
+}
+
+// LAUNCH READINESS CHECKLIST
+model LaunchChecklistItem {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Checklist Item
+  itemKey     String            @unique // e.g., "haitian_counsel_opinion"
+  title       String
+  description String            @db.Text
+  category    ChecklistCategory
+  required    Boolean           @default(true)
+  sortOrder   Int               @default(0)
+
+  // Completion Status
+  checked       Boolean   @default(false)
+  checkedBy     String? // Who checked it off
+  checkedAt     DateTime?
+  documentRef   String? // Reference to document/evidence
+  documentUrl   String? // URL to uploaded document
+  notes         String?   @db.Text
+
+  @@index([category])
+  @@index([checked])
+}
+
+enum ChecklistCategory {
+  LEGAL_HAITI
+  LEGAL_US
+  ENTITY_TAX
+  FINANCIAL
+  TECHNICAL
+  COMPLIANCE
+}
+
+// ============================================================================
+// WAITLIST & NEWSLETTER (Works in WAITLIST and DONATIONS_LIVE modes)
+// ============================================================================
+
+// WAITLIST SIGNUPS (Launch notifications)
+model WaitlistSignup {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Contact Info (encrypted)
+  email    String  @unique
+  whatsapp String? // Optional (phone number)
+  
+  // Demographics (for segmentation)
+  country         String // ISO 3166-1 alpha-2
+  communeOfOrigin String? // Commune slug or "other" or "elsewhere"
+  preferredLocale String  @default("en") // ht, fr, en
+  
+  // Consent (unbundled)
+  emailConsent        Boolean @default(false)
+  whatsappConsent     Boolean @default(false)
+  emailConsentedAt    DateTime?
+  whatsappConsentedAt DateTime?
+  
+  // Double opt-in for email
+  emailVerified        Boolean @default(false)
+  emailVerificationToken String? @unique
+  emailVerifiedAt      DateTime?
+  
+  // Consent proof (audit trail)
+  consentIpAddress String?
+  consentUserAgent String? @db.Text
+  consentText      String  @db.Text // Exact text shown at signup
+  
+  // Metadata
+  referralCode String?
+  source       String? // "home", "chapter", "supporter"
+  
+  // Status
+  notified     Boolean   @default(false) // Notified of launch
+  notifiedAt   DateTime?
+  unsubscribed Boolean   @default(false)
+  unsubscribedAt DateTime?
+
+  @@index([email])
+  @@index([country])
+  @@index([communeOfOrigin])
+  @@index([emailVerified])
+  @@index([createdAt])
+  @@index([notified])
+  @@index([unsubscribed])
+}
+
+// NEWSLETTER SUBSCRIBERS
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Contact Info
+  email String @unique
+  
+  // Demographics (for segmentation)
+  country         String?
+  communeOfOrigin String?
+  chapterId       String?
+  chapter         Chapter? @relation(fields: [chapterId], references: [id])
+  preferredLocale String   @default("en")
+  
+  // Subscription status
+  status         SubscriberStatus @default(PENDING)
+  subscribedAt   DateTime?
+  unsubscribedAt DateTime?
+  
+  // Double opt-in
+  verified             Boolean   @default(false)
+  verificationToken    String?   @unique
+  verifiedAt           DateTime?
+  verificationSentAt   DateTime?
+  
+  // Consent proof
+  consentIpAddress String?
+  consentUserAgent String? @db.Text
+  consentText      String  @db.Text
+  
+  // Engagement
+  lastEmailSentAt DateTime?
+  lastOpenedAt    DateTime?
+  lastClickedAt   DateTime?
+  openCount       Int      @default(0)
+  clickCount      Int      @default(0)
+  
+  // Bounce handling
+  bounced         Boolean   @default(false)
+  bouncedAt       DateTime?
+  bounceType      String? // "hard", "soft", "complaint"
+  bounceReason    String?   @db.Text
+  
+  // Metadata
+  source       String? // Where they signed up
+  referralCode String?
+  tags         String[] // For custom segmentation
+  
+  // Relations
+  newsletterSends NewsletterSend[]
+
+  @@index([email])
+  @@index([status])
+  @@index([country])
+  @@index([communeOfOrigin])
+  @@index([chapterId])
+  @@index([verified])
+  @@index([bounced])
+}
+
+enum SubscriberStatus {
+  PENDING      // Awaiting verification
+  ACTIVE       // Subscribed and verified
+  UNSUBSCRIBED // Opted out
+  BOUNCED      // Email bounced (hard)
+  COMPLAINED   // Marked as spam
+}
+
+// NEWSLETTER CAMPAIGNS
+model Newsletter {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Newsletter identity
+  slug String @unique
+  
+  // Localized content
+  subjectHt String
+  subjectFr String
+  subjectEn String
+  bodyHt    String  @db.Text
+  bodyFr    String  @db.Text
+  bodyEn    String  @db.Text
+  
+  // Preview text (first line in email client)
+  previewTextHt String?
+  previewTextFr String?
+  previewTextEn String?
+  
+  // Sender identification (required in every email)
+  senderName  String @default("Diaspora4Bellefleur")
+  senderEmail String
+  replyTo     String?
+  
+  // Segmentation
+  segmentCountries String[] // Empty = all countries
+  segmentCommunes  String[] // Empty = all communes
+  segmentChapters  String[] // Chapter IDs, empty = all
+  segmentTags      String[] // Subscriber tags
+  
+  // Status
+  status      NewsletterStatus @default(DRAFT)
+  
+  // Scheduling
+  scheduledFor DateTime?
+  sentAt       DateTime?
+  
+  // Stats
+  recipientCount Int @default(0)
+  sentCount      Int @default(0)
+  deliveredCount Int @default(0)
+  openedCount    Int @default(0)
+  clickedCount   Int @default(0)
+  bouncedCount   Int @default(0)
+  
+  // Created by
+  createdBy      String
+  createdByEmail String
+  approvedBy     String?
+  approvedByEmail String?
+  approvedAt     DateTime?
+  
+  // Test sends
+  testSentTo String[] // Email addresses
+  testSentAt DateTime?
+  
+  // Relations
+  sends NewsletterSend[]
+  
+  @@index([status])
+  @@index([scheduledFor])
+  @@index([sentAt])
+}
+
+enum NewsletterStatus {
+  DRAFT      // Being composed
+  READY      // Ready to send
+  SCHEDULED  // Scheduled for future send
+  SENDING    // Currently sending
+  SENT       // Completed
+  CANCELLED  // Cancelled before send
+}
+
+// NEWSLETTER SENDS (Individual recipient tracking)
+model NewsletterSend {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Newsletter
+  newsletterId String
+  newsletter   Newsletter @relation(fields: [newsletterId], references: [id], onDelete: Cascade)
+  
+  // Subscriber
+  subscriberId String
+  subscriber   NewsletterSubscriber @relation(fields: [subscriberId], references: [id], onDelete: Cascade)
+  
+  // Send details
+  locale      String // ht, fr, en (which version was sent)
+  sentAt      DateTime?
+  deliveredAt DateTime?
+  
+  // Engagement
+  openedAt       DateTime?
+  firstOpenedAt  DateTime?
+  openCount      Int      @default(0)
+  clickedAt      DateTime?
+  firstClickedAt DateTime?
+  clickCount     Int      @default(0)
+  
+  // Failure
+  failedAt     DateTime?
+  failureReason String? @db.Text
+  bouncedAt    DateTime?
+  bounceType   String? // "hard", "soft", "complaint"
+  
+  // Provider tracking
+  providerMessageId String? @unique
+  
+  @@unique([newsletterId, subscriberId])
+  @@index([newsletterId])
+  @@index([subscriberId])
+  @@index([sentAt])
+  @@index([openedAt])
+}
+
+// VOLUNTEER SIGNUPS
+model Volunteer {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Contact
+  email       String  @unique
+  firstName   String
+  lastName    String
+  whatsapp    String?
+  preferredLocale String @default("en")
+  
+  // Location
+  country      String
+  city         String?
+  timeZone     String? // IANA time zone
+  
+  // Skills (multi-select)
+  skills       VolunteerSkill[]
+  skillsOther  String? // Free text for "other"
+  
+  // Availability
+  hoursPerWeek String? // "1-5", "5-10", "10-20", "20+"
+  availability String? @db.Text // Free text for specific times
+  
+  // Interests
+  interests String[] // Chapter IDs or "events", "translation", etc.
+  
+  // Status
+  status       VolunteerStatus @default(PENDING)
+  approvedBy   String?
+  approvedAt   DateTime?
+  
+  // Consent
+  consentIpAddress String?
+  consentUserAgent String? @db.Text
+  
+  // Communication preferences
+  emailUpdates Boolean @default(true)
+  
+  // Metadata
+  source       String? // Where they signed up
+  referralCode String?
+  notes        String? @db.Text // Admin notes
+  
+  // Relations
+  assignments VolunteerAssignment[]
+
+  @@index([email])
+  @@index([status])
+  @@index([country])
+  @@index([skills])
+}
+
+enum VolunteerSkill {
+  TRANSLATION     // Haitian Creole, French, English
+  DESIGN          // Graphics, flyers, social media
+  SOCIAL_MEDIA    // Community management, content
+  EVENTS          // Organizing events
+  LEGAL           // Legal expertise
+  TECH            // Technical/web development
+  WRITING         // Content writing
+  OUTREACH        // Phone banking, canvassing
+  FUNDRAISING     // Fundraising support
+  DATA_ENTRY      // Administrative support
+  OTHER           // Other skills
+}
+
+enum VolunteerStatus {
+  PENDING  // Awaiting review
+  ACTIVE   // Approved and available
+  INACTIVE // Not currently available
+  ARCHIVED // No longer volunteering
+}
+
+// VOLUNTEER ASSIGNMENTS (Admin assigns volunteers to tasks)
+model VolunteerAssignment {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Volunteer
+  volunteerId String
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+  
+  // Assignment details
+  title       String
+  description String  @db.Text
+  skill       VolunteerSkill?
+  
+  // Status
+  status      AssignmentStatus @default(PENDING)
+  assignedBy  String
+  assignedAt  DateTime         @default(now())
+  acceptedAt  DateTime?
+  completedAt DateTime?
+  
+  // Deadline
+  dueDate DateTime?
+  
+  // Communication
+  notes String? @db.Text
+
+  @@index([volunteerId])
+  @@index([status])
+}
+
+enum AssignmentStatus {
+  PENDING   // Assigned, awaiting acceptance
+  ACCEPTED  // Volunteer accepted
+  COMPLETED // Marked complete
+  DECLINED  // Volunteer declined
+  CANCELLED // Assignment cancelled
+}
+
+// EVENTS
+model Event {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Event identity
+  slug String @unique
+  
+  // Localized content
+  titleHt       String
+  titleFr       String
+  titleEn       String
+  descriptionHt String  @db.Text
+  descriptionFr String  @db.Text
+  descriptionEn String  @db.Text
+  
+  // Date & time
+  startDateTime DateTime
+  endDateTime   DateTime?
+  timeZone      String // IANA time zone
+  allDay        Boolean @default(false)
+  
+  // Location
+  locationType EventLocationType
+  locationName String?
+  address      String? @db.Text
+  city         String?
+  country      String?
+  virtualUrl   String? // Zoom, Google Meet, etc.
+  
+  // Organizer
+  organizerName  String
+  organizerEmail String
+  
+  // Chapter association (optional)
+  chapterId String?
+  chapter   Chapter? @relation(fields: [chapterId], references: [id])
+  
+  // RSVP settings
+  rsvpEnabled      Boolean @default(true)
+  rsvpCapacity     Int?
+  rsvpDeadline     DateTime?
+  requiresApproval Boolean @default(false)
+  
+  // Status
+  status      EventStatus @default(DRAFT)
+  publishedAt DateTime?
+  publishedBy String?
+  
+  // Stats
+  rsvpCount Int @default(0)
+  
+  // Relations
+  rsvps EventRSVP[]
+  
+  @@index([slug])
+  @@index([status])
+  @@index([startDateTime])
+  @@index([chapterId])
+}
+
+enum EventLocationType {
+  IN_PERSON // Physical location
+  VIRTUAL   // Online only
+  HYBRID    // Both in-person and virtual
+}
+
+enum EventStatus {
+  DRAFT     // Being created
+  PUBLISHED // Visible and accepting RSVPs
+  CANCELLED // Event cancelled
+  PAST      // Event already happened
+}
+
+// EVENT RSVPS
+model EventRSVP {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Event
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  
+  // Attendee
+  email     String
+  firstName String
+  lastName  String
+  
+  // RSVP details
+  status     RSVPStatus @default(PENDING)
+  guests     Int        @default(0) // Number of additional guests
+  
+  // Approval workflow
+  approvedBy String?
+  approvedAt DateTime?
+  
+  // Attendance
+  checkedIn   Boolean   @default(false)
+  checkedInAt DateTime?
+  
+  // Communication
+  reminderSentAt DateTime?
+  
+  // Metadata
+  notes String? @db.Text // Guest notes/requests
+  
+  @@unique([eventId, email])
+  @@index([eventId])
+  @@index([email])
+  @@index([status])
+}
+
+enum RSVPStatus {
+  PENDING   // Awaiting approval (if required)
+  CONFIRMED // Confirmed attendance
+  DECLINED  // Declined invitation
+  CANCELLED // Cancelled after confirming
+  WAITLIST  // On waitlist (capacity reached)
+}
+
+// Q&A INBOX (Ask a question form)
+model Question {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Question details
+  email        String
+  name         String?
+  locale       String  @default("en")
+  subject      String?
+  question     String  @db.Text
+  
+  // Status
+  status       QuestionStatus @default(PENDING)
+  
+  // Response
+  response     String? @db.Text
+  respondedBy  String?
+  respondedAt  DateTime?
+  
+  // Canned reply used (if any)
+  cannedReplyId String?
+  cannedReply   CannedReply? @relation(fields: [cannedReplyId], references: [id])
+  
+  // Metadata
+  ipAddress    String?
+  userAgent    String? @db.Text
+  referralCode String?
+  
+  // Spam detection
+  spamScore    Float?
+  markedAsSpam Boolean @default(false)
+  
+  @@index([status])
+  @@index([createdAt])
+  @@index([email])
+}
+
+enum QuestionStatus {
+  PENDING   // Awaiting response
+  RESPONDED // Response sent
+  ARCHIVED  // Archived without response
+  SPAM      // Marked as spam
+}
+
+// CANNED REPLIES (Pre-written responses)
+model CannedReply {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Reply identity
+  slug String @unique
+  
+  // Localized content
+  titleHt   String
+  titleFr   String
+  titleEn   String
+  contentHt String  @db.Text
+  contentFr String  @db.Text
+  contentEn String  @db.Text
+  
+  // Usage stats
+  useCount Int @default(0)
+  
+  // Relations
+  questions Question[]
+  
+  @@index([slug])
+}
+
+// SUBSCRIBER EXPORT AUDIT LOG
+model SubscriberExport {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Export details
+  exportType   String // "waitlist", "newsletter", "volunteers"
+  format       String // "csv", "json"
+  
+  // Filters applied
+  filters      Json
+  
+  // Results
+  recordCount  Int
+  
+  // Exported by
+  exportedBy      String
+  exportedByEmail String
+  exportedByRole  String
+  
+  // IP address
+  ipAddress    String?
+  
+  // File reference (if stored)
+  fileUrl      String?
+  
+  // Reason (required for audit)
+  reason       String @db.Text
+  
+  @@index([exportedBy])
+  @@index([createdAt])
+}
+
+// Add relation to Chapter for events and newsletter subscribers
+
+// CONTENT (Sourced, versioned content blocks)
+model Content {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Content Identity
+  slug     String         @unique
+  category ContentCategory
+  status   ContentStatus  @default(DRAFT)
+
+  // Localized Text
+  textHt String? @db.Text
+  textFr String? @db.Text
+  textEn String? @db.Text
+
+  // Date Information
+  date          DateTime?
+  datePrecision DatePrecision @default(EXACT)
+
+  // Quote (requires exact source and date)
+  quote         String? @db.Text
+  quoteSourced  Boolean @default(false) // Must be true for quotes to be published
+  quoteOriginalLanguage String?
+
+  // Source & Verification
+  sources          ContentSource[]
+  confidence       ContentConfidence @default(REPORTED_SINGLE_SOURCE)
+  
+  // Publishing
+  publishedAt      DateTime?
+  publishedBy      String? // User who published
+  verifiedBy       String? // Who verified this content
+  verificationDate DateTime?
+  verificationNotes String? @db.Text
+
+  // Metadata
+  author String?
+  tags   String[]
+  order  Int @default(0) // Display order within category
+
+  @@index([slug])
+  @@index([status])
+  @@index([category])
+  @@index([order])
+}
+
+// Sources for content (one-to-many)
+model ContentSource {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  contentId String
+
+  // Source Information
+  title      String
+  publisher  String
+  url        String
+  language   String // ISO 639-1 code
+  accessedOn DateTime
+
+  // Evidence file (uploaded)
+  fileUrl String?
+
+  order Int @default(0)
+
+  @@index([contentId])
+}
+
+enum ContentCategory {
+  BIOGRAPHY
+  EDUCATION
+  PROFESSION
+  PUBLIC_SERVICE
+  PARTY_AFFILIATION
+  CEP_REGISTRATION
+  ELECTIONS
+  NEWS
+  TESTIMONIAL
+  FAQ_ANSWER
+  OTHER
+}
+
+enum ContentStatus {
+  DRAFT
+  NEEDS_REVIEW
+  PUBLISHED
+  ARCHIVED
+}
+
+enum ContentConfidence {
+  CONFIRMED         // Multiple sources or official document
+  REPORTED_SINGLE_SOURCE // One source
+  DISPUTED_DATE     // Facts confirmed but date uncertain
+}
+
+enum DatePrecision {
+  EXACT   // Specific date known
+  MONTH   // Month and year known
+  YEAR    // Only year known
+  UNKNOWN // Date unknown
+}
+
+// CAMPAIGN FACTS INTAKE
+model IntakeSubmission {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Submission Info
+  category      IntakeCategory
+  status        IntakeStatus @default(PENDING)
+  priority      Boolean      @default(false)
+
+  // Submitted Facts
+  factTextHt   String? @db.Text
+  factTextFr   String? @db.Text
+  factTextEn   String? @db.Text
+  submittedBy  String // Email or name
+  contactEmail String?
+
+  // Evidence
+  evidenceUrls  String[] // Uploaded files or links
+  evidenceNotes String?  @db.Text
+
+  // Processing
+  reviewedBy     String?
+  reviewedAt     DateTime?
+  reviewNotes    String?   @db.Text
+  
+  // Content created from this intake
+  contentId String? // Link to Content entry if created
+
+  // Metadata
+  ipAddress String?
+  userAgent String? @db.Text
+
+  @@index([status])
+  @@index([category])
+  @@index([createdAt])
+}
+
+enum IntakeCategory {
+  CEP_REGISTRATION
+  PARTY_2026
+  EDUCATION
+  WORK_HISTORY
+  PUBLIC_SERVICE
+  BIOGRAPHY
+  PHOTO
+  LOGO
+  NAME_PERMISSION
+  OTHER
+}
+
+enum IntakeStatus {
+  PENDING      // Awaiting review
+  IN_REVIEW    // Being reviewed
+  APPROVED     // Facts verified, content created
+  REJECTED     // Not credible or insufficient evidence
+  NEEDS_MORE   // Needs additional evidence
+}
+
+// REQUIRED INTAKE CHECKLIST
+model IntakeChecklist {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Checklist Item
+  itemKey     String @unique // e.g., "cep_registration"
+  title       String
+  description String @db.Text
+  required    Boolean @default(true)
+  category    IntakeCategory
+  sortOrder   Int    @default(0)
+
+  // Completion Status
+  completed      Boolean   @default(false)
+  completedBy    String?
+  completedAt    DateTime?
+  submissionId   String? // Link to IntakeSubmission
+  evidenceUrl    String?
+  verificationNotes String? @db.Text
+
+  @@index([completed])
+  @@index([category])
+}
+
+// FAQ ENTRIES
+model FAQ {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Question
+  questionHt String @db.Text
+  questionFr String @db.Text
+  questionEn String @db.Text
+
+  // Answer (sourced)
+  answerHt String @db.Text
+  answerFr String @db.Text
+  answerEn String @db.Text
+
+  // Sources for answer
+  sources FAQSource[]
+
+  // Status
+  status    ContentStatus @default(DRAFT)
+  publishedAt DateTime?
+  publishedBy String?
+
+  // Display
+  order    Int     @default(0)
+  featured Boolean @default(false) // Show on home page preview
+  category String? // Optional grouping
+
+  @@index([status])
+  @@index([order])
+  @@index([featured])
+}
+
+model FAQSource {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  faq   FAQ    @relation(fields: [faqId], references: [id], onDelete: Cascade)
+  faqId String
+
+  title     String
+  url       String?
+  publisher String?
+  notes     String? @db.Text
+
+  @@index([faqId])
+}
+
+// CONTRIBUTIONS
+model Contribution {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Amounts (in cents)
+  amountCents Int
+  currency    String @default("USD")
+
+  // Donor Information (encrypted at rest)
+  donorId            String?
+  donor              Donor?  @relation(fields: [donorId], references: [id])
+  donorEmail         String
+  donorFirstName     String
+  donorLastName      String
+  donorCountry       String // ISO 3166-1 alpha-2
+  donorPostalCode    String?
+  donorOptInPublic   Boolean @default(false)
+  donorOptInEmail    Boolean @default(false)
+
+  // Payment Information
+  paymentProvider     String // "stripe", "paypal", etc.
+  paymentIntentId     String  @unique
+  paymentStatus       PaymentStatus @default(PENDING)
+  paymentCompletedAt  DateTime?
+  paymentFailedReason String?
+
+  // Compliance
+  complianceChecked   Boolean @default(false)
+  complianceFlags     String[] // Any compliance issues
+  complianceNotes     String?  @db.Text
+
+  // Receipt
+  receiptNumber String? @unique
+  receiptSentAt DateTime?
+
+  // Metadata
+  ipAddress    String?
+  userAgent    String?  @db.Text
+  locale       String   @default("en")
+  referralCode String?
+  
+  // Relation to payment intent
+  paymentIntent PaymentIntent?
+  
+  // Relations for privacy, refunds, and fraud detection
+  fraudEvents          FraudEvent[]
+  manualReviewItems    ManualReviewItem[]
+  emailVerificationToken EmailVerificationToken?
+  receipts             Receipt[]
+  refundMagicLinks     RefundMagicLink[]
+  refundTickets        RefundTicket[]
+  chargebacks          Chargeback[]
+  attribution          Attribution?
+
+  @@index([donorEmail])
+  @@index([paymentStatus])
+  @@index([createdAt])
+  @@index([paymentIntentId])
+}
+
+enum PaymentStatus {
+  PENDING      // Initial state
+  PROCESSING   // Payment intent created, awaiting confirmation
+  SUCCEEDED    // Payment successful
+  FAILED       // Payment failed
+  REFUNDED     // Fully refunded
+  DISPUTED     // Chargeback/dispute filed
+  UNDER_REVIEW // Compliance review required
+  CANCELLED    // Cancelled before completion
+}
+
+// PAYMENT INTENTS (Provider-agnostic payment records)
+model PaymentIntent {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Provider Information
+  provider         String // "stripe", "mock", etc.
+  providerIntentId String @unique // Provider's payment intent ID
+  
+  // Amount
+  amountCents Int
+  currency    String @default("USD")
+  
+  // Status
+  status PaymentStatus @default(PENDING)
+  
+  // Compliance Check Reference
+  complianceCheckId String  @unique
+  complianceCheck   ComplianceCheck @relation(fields: [complianceCheckId], references: [id])
+  
+  // Contribution Reference (created after success)
+  contributionId String? @unique
+  contribution   Contribution? @relation(fields: [contributionId], references: [id])
+  
+  // Payment Method Details (from provider)
+  paymentMethodType String? // "card", "apple_pay", "google_pay"
+  cardLast4         String?
+  cardBrand         String?
+  cardExpMonth      Int?
+  cardExpYear       Int?
+  
+  // Timestamps
+  confirmedAt DateTime?
+  failedAt    DateTime?
+  
+  // Failure Details
+  failureCode    String?
+  failureMessage String?
+  
+  // Idempotency
+  idempotencyKey String @unique
+  
+  // Metadata
+  metadata Json?
+  
+  // Relations
+  ledgerEntries LedgerEntry[]
+  webhookEvents WebhookEvent[]
+  
+  @@index([provider])
+  @@index([status])
+  @@index([createdAt])
+  @@index([providerIntentId])
+}
+
+// WEBHOOK EVENTS (Idempotent webhook processing)
+model WebhookEvent {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Provider Information
+  provider       String
+  providerEventId String @unique // Provider's event ID (for idempotency)
+  eventType      String
+  
+  // Associated Payment
+  paymentIntentId String?
+  paymentIntent   PaymentIntent? @relation(fields: [paymentIntentId], references: [id])
+  
+  // Processing
+  processed    Boolean  @default(false)
+  processedAt  DateTime?
+  processingError String? @db.Text
+  retryCount   Int @default(0)
+  
+  // Signature Verification
+  signatureValid Boolean @default(false)
+  
+  // Raw Payload
+  payload Json
+  
+  @@index([provider])
+  @@index([providerEventId])
+  @@index([processed])
+  @@index([createdAt])
+}
+
+// DOUBLE-ENTRY LEDGER (Append-only, immutable)
+model LedgerEntry {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Entry Type
+  entryType LedgerEntryType
+  
+  // Payment Reference
+  paymentIntentId String
+  paymentIntent   PaymentIntent @relation(fields: [paymentIntentId], references: [id])
+  
+  // Donor Reference
+  donorEmail String
+  
+  // Amounts (in USD cents)
+  debitCents  Int @default(0)
+  creditCents Int @default(0)
+  
+  // Account
+  account LedgerAccount
+  
+  // Description
+  description String @db.Text
+  
+  // References
+  complianceCheckId String
+  attestationVersion Json? // Snapshot of attestations at time of payment
+  rulesVersion      Json? // Snapshot of rules at time of payment
+  
+  // Metadata
+  metadata Json?
+  
+  // Immutable - never updated after creation
+  @@index([paymentIntentId])
+  @@index([account])
+  @@index([entryType])
+  @@index([createdAt])
+}
+
+enum LedgerEntryType {
+  DONATION            // Gross donation received
+  PROCESSING_FEE      // Payment processor fee
+  NET_DONATION        // Net after fees
+  REFUND              // Full or partial refund
+  CHARGEBACK          // Dispute/chargeback
+  CHARGEBACK_REVERSAL // Chargeback won/reversed
+  TRANSFER_OUT        // Transfer to recipient
+  TRANSFER_FEE        // Transfer/payout fee
+  ADJUSTMENT          // Manual adjustment (requires approval)
+}
+
+enum LedgerAccount {
+  GROSS_DONATIONS     // Total donations received
+  PROCESSING_FEES     // Fees paid to processor
+  NET_DONATIONS       // Net available for transfer
+  REFUNDS             // Refunds issued
+  CHARGEBACKS         // Chargebacks lost
+  TRANSFERS_OUT       // Funds transferred to recipient
+  TRANSFER_FEES       // Transfer fees
+  SUSPENSE            // Temporary holding (disputes, etc.)
+}
+
+// ============================================================================
+// COMMUNICATIONS (Consent, Channels, Messages)
+// ============================================================================
+
+// CONTACT (Encrypted PII with blind indexes)
+model Contact {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Encrypted Fields
+  nameEncrypted  String? // AES-256-GCM encrypted
+  emailEncrypted String? // AES-256-GCM encrypted
+  phoneEncrypted String? // AES-256-GCM encrypted
+
+  // Blind Indexes (for searching without decryption)
+  emailBlindIndex String? @unique // HMAC-SHA256 hash
+  phoneBlindIndex String? @unique // HMAC-SHA256 hash
+
+  // Demographics
+  locale  String @default("en")
+  country String?
+
+  // Relations
+  consents     ChannelConsent[]
+  suppressions Suppression[]
+  messageLogs  MessageLog[]
+
+  @@index([emailBlindIndex])
+  @@index([phoneBlindIndex])
+  @@index([country])
+}
+
+// CHANNEL CONSENT (Per channel, per topic)
+model ChannelConsent {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Contact
+  contactId String
+  contact   Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  // Channel and Topic
+  channel CommunicationChannel
+  topic   CommunicationTopic
+
+  // Status
+  status ConsentStatus @default(PENDING)
+
+  // Grant Timestamp
+  grantedAt DateTime?
+
+  // Consent Proof (Audit Trail)
+  ipAddress    String?
+  userAgent    String? @db.Text
+  consentTextVersionId String? // Reference to ConsentTextVersion
+
+  // Revocation
+  revokedAt        DateTime?
+  revocationReason String? @db.Text
+
+  // Double Opt-In (Email and SMS)
+  verificationToken String? @unique
+  verifiedAt        DateTime?
+
+  @@unique([contactId, channel, topic])
+  @@index([contactId])
+  @@index([channel])
+  @@index([topic])
+  @@index([status])
+}
+
+enum CommunicationChannel {
+  EMAIL
+  SMS
+  TELEGRAM
+  WEB_PUSH
+}
+
+enum CommunicationTopic {
+  NEWS       // General updates
+  EVENTS     // Event invitations
+  FUNDRAISING // Contribution asks
+  VOLUNTEER  // Volunteer opportunities
+}
+
+enum ConsentStatus {
+  PENDING       // Awaiting double opt-in
+  ACTIVE        // Active consent
+  UNSUBSCRIBED  // User unsubscribed
+  BOUNCED       // Hard bounce
+  COMPLAINED    // Spam complaint
+  SUPPRESSED    // Administratively suppressed
+}
+
+// SUPPRESSION LIST (Global or per-channel)
+model Suppression {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Contact
+  contactId String
+  contact   Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  // Suppression Type
+  suppressionType SuppressionType
+  channel         CommunicationChannel?
+
+  // Reason
+  reason String @db.Text
+
+  // Permanent
+  permanent Boolean @default(true)
+
+  @@index([contactId])
+  @@index([suppressionType])
+  @@index([channel])
+}
+
+enum SuppressionType {
+  GLOBAL           // Suppress from all channels
+  CHANNEL_SPECIFIC // Suppress from specific channel only
+}
+
+// MESSAGE LOG (Audit trail, body not stored for FUNDRAISING)
+model MessageLog {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Contact
+  contactId String
+  contact   Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  // Message Details
+  channel CommunicationChannel
+  topic   CommunicationTopic
+  subject String?
+  body    String? @db.Text // NULL for FUNDRAISING topic
+
+  // Status
+  status      MessageStatus @default(SENT)
+  sentAt      DateTime?
+  deliveredAt DateTime?
+  openedAt    DateTime?
+  clickedAt   DateTime?
+  failedAt    DateTime?
+  failureReason String? @db.Text
+
+  // Provider Reference
+  providerMessageId String?
+
+  @@index([contactId])
+  @@index([channel])
+  @@index([topic])
+  @@index([status])
+  @@index([sentAt])
+}
+
+
+// CHANNEL CONFIG (Per-channel settings)
+model ChannelConfig {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Channel
+  channel CommunicationChannel @unique
+
+  // Enabled
+  enabled Boolean @default(false)
+
+  // Quiet Hours (for SMS)
+  quietHoursStart Int? // Hour (0-23)
+  quietHoursEnd   Int? // Hour (0-23)
+
+  // Country Restrictions
+  allowedCountries String[] // ISO 3166-1 alpha-2, empty = all
+
+  // Rate Limits
+  maxPerDay     Int?
+  maxPerHour    Int?
+
+  // Compliance Checklist
+  checklistComplete Boolean @default(false)
+
+  // Health Status
+  healthStatus    ChannelHealthStatus @default(UNKNOWN)
+  lastHealthCheck DateTime?
+  healthError     String? @db.Text
+
+  @@index([channel])
+  @@index([enabled])
+}
+
+enum ChannelHealthStatus {
+  HEALTHY
+  DEGRADED
+  DOWN
+  UNKNOWN
+}
+
+// CONSENT TEXT VERSIONS (Audit trail for consent wording changes)
+model ConsentTextVersion {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Version
+  version String @unique
+
+  // Localized Text
+  textHt String @db.Text
+  textFr String @db.Text
+  textEn String @db.Text
+
+  // Active
+  active Boolean @default(false)
+
+  @@index([active])
+  @@index([version])
+}
+
+// WHATSAPP CONFIG (Manual presence only, NO API)
+model WhatsAppConfig {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Channel URL (WhatsApp Channel invite link)
+  channelUrl String?
+
+  // Guidelines Reviewed
+  guidelinesReviewed   Boolean   @default(false)
+  guidelinesReviewedBy String?
+  guidelinesReviewedAt DateTime?
+
+  // Singleton pattern
+  @@index([guidelinesReviewed])
+}
+
+// ============================================================================
+// CAMPAIGN MESSAGING ENGINE
+// ============================================================================
+
+// MESSAGE (Campaign message with per-channel variants)
+model Message {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Message Identity
+  slug String @unique
+  internalName String // Admin-facing name
+
+  // Workflow
+  status MessageStatus @default(DRAFT)
+  
+  // Authorship
+  createdBy      String // User ID
+  createdByEmail String
+  
+  // Review (Two-person rule)
+  inReviewAt       DateTime?
+  approvedBy       String?
+  approvedByEmail  String?
+  approvedAt       DateTime?
+  secondApprovedBy      String? // Required for large audiences
+  secondApprovedByEmail String?
+  secondApprovedAt      DateTime?
+  requiresSecondApproval Boolean @default(false)
+  
+  // Scheduling
+  scheduledFor DateTime?
+  sendingStartedAt DateTime?
+  sendingCompletedAt DateTime?
+  
+  // Audience
+  audienceSnapshot Json? // Snapshotted at send time
+  estimatedRecipients Int @default(0)
+  
+  // Topic (for consent checking)
+  topic CommunicationTopic
+  
+  // Content Checks
+  hasFactualClaims Boolean @default(false)
+  factualClaimsVerified Boolean @default(false)
+  hasFundraisingAsk Boolean @default(false)
+  fundraisingCheckPassed Boolean @default(false)
+  
+  // Stats
+  totalSent      Int @default(0)
+  totalDelivered Int @default(0)
+  totalBounced   Int @default(0)
+  totalFailed    Int @default(0)
+  totalOpened    Int @default(0) // If tracking enabled
+  totalClicked   Int @default(0) // If tracking enabled
+  
+  // Cost (SMS)
+  estimatedCostCents Int?
+  actualCostCents    Int?
+  
+  // Relations
+  variants MessageVariant[]
+  testSends TestSend[]
+  deliveryJobs DeliveryJob[]
+  messageAudiences MessageAudience[]
+  whatsappTasks WhatsAppChannelTask[]
+  
+  @@index([status])
+  @@index([scheduledFor])
+  @@index([topic])
+  @@index([createdBy])
+}
+
+enum MessageStatus {
+  DRAFT      // Being composed
+  IN_REVIEW  // Submitted for approval
+  APPROVED   // Approved, ready to schedule
+  SCHEDULED  // Scheduled for future send
+  SENDING    // Currently sending
+  SENT       // Send completed
+  CANCELLED  // Cancelled before send
+  FAILED     // Send failed
+}
+
+// MESSAGE VARIANT (Per-channel, per-locale content)
+model MessageVariant {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Message
+  messageId String
+  message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  
+  // Channel and Locale
+  channel CommunicationChannel
+  locale  String // ht, fr, en
+  
+  // Email Content
+  emailSubject   String?
+  emailPreheader String? // First line preview
+  emailBodyHtml  String? @db.Text
+  emailBodyText  String? @db.Text
+  
+  // SMS Content
+  smsBody String? @db.Text
+  smsSegmentCount Int? // Calculated: GSM-7 (160 chars) vs Unicode (70 chars)
+  smsIsUnicode Boolean @default(false)
+  smsEstimatedCostCents Int?
+  
+  // Telegram Content
+  telegramBody String? @db.Text
+  
+  // Web Push Content
+  webPushTitle String?
+  webPushBody  String? @db.Text
+  webPushIcon  String? // URL to icon
+  webPushUrl   String? // Click action URL
+  
+  // WhatsApp Channel Content (manual publish)
+  whatsappChannelText String? @db.Text
+  whatsappChannelMediaUrls String[] // Image/video URLs for download
+  
+  // Template Variables (JSON)
+  templateVariables Json?
+  
+  @@unique([messageId, channel, locale])
+  @@index([messageId])
+  @@index([channel])
+}
+
+// TEST SEND
+model TestSend {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Message
+  messageId String
+  message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  
+  // Test Details
+  sentBy      String
+  sentByEmail String
+  sentTo      String // Test recipient address
+  channel     CommunicationChannel
+  locale      String
+  
+  // Result
+  success Boolean
+  error   String? @db.Text
+  
+  @@index([messageId])
+}
+
+// DELIVERY JOB (Durable queue, resumable)
+model DeliveryJob {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Message
+  messageId String
+  message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  
+  // Job Details
+  channel CommunicationChannel
+  locale  String
+  
+  // Recipient Batch
+  recipientContactIds String[] // Array of Contact IDs
+  batchStartIndex     Int @default(0)
+  batchSize           Int @default(100)
+  
+  // Status
+  status DeliveryJobStatus @default(PENDING)
+  
+  // Progress
+  processedCount Int @default(0)
+  successCount   Int @default(0)
+  failedCount    Int @default(0)
+  skippedCount   Int @default(0) // Suppressed, no consent, quiet hours, etc.
+  
+  // Execution
+  startedAt   DateTime?
+  completedAt DateTime?
+  failedAt    DateTime?
+  
+  // Error Handling
+  retryCount Int     @default(0)
+  maxRetries Int     @default(3)
+  error      String? @db.Text
+  
+  // Idempotency
+  idempotencyKey String @unique
+  
+  // Next batch cursor (for resumption)
+  nextBatchCursor String?
+  
+  @@index([messageId])
+  @@index([status])
+  @@index([channel])
+}
+
+enum DeliveryJobStatus {
+  PENDING    // Queued, not started
+  RUNNING    // Currently processing
+  COMPLETED  // Successfully completed
+  FAILED     // Failed with errors
+  CANCELLED  // Manually cancelled
+}
+
+// MESSAGE AUDIENCE (Segment definition)
+model MessageAudience {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Message
+  messageId String
+  message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  
+  // Segment Criteria (JSON)
+  criteria Json // { channels: [], topics: [], locales: [], countries: [], ... }
+  
+  // Computed Preview
+  estimatedCount Int @default(0)
+  lastCountedAt  DateTime?
+  
+  @@index([messageId])
+}
+
+// WHATSAPP CHANNEL TASK (Manual publish assistant)
+model WhatsAppChannelTask {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Message
+  messageId String
+  message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  
+  // Locale
+  locale String
+  
+  // Assigned To
+  assignedTo      String // User ID
+  assignedToEmail String
+  
+  // Task Status
+  status WhatsAppTaskStatus @default(PENDING)
+  
+  // Ready-to-paste Content
+  textToPaste String @db.Text
+  mediaDownloadUrls String[] // Pre-sized for WhatsApp
+  
+  // Reminder
+  reminderSentAt DateTime?
+  
+  // Completion
+  markedPostedAt   DateTime?
+  markedPostedBy   String?
+  postLink         String? // WhatsApp Channel post link
+  postPublishedAt  DateTime? // Actual publish time
+  
+  @@index([messageId])
+  @@index([assignedTo])
+  @@index([status])
+}
+
+enum WhatsAppTaskStatus {
+  PENDING   // Awaiting action
+  REMINDED  // Reminder sent
+  POSTED    // Marked as posted
+  CANCELLED // Task cancelled
+}
+
+// MESSAGE SEND RECORD (Individual recipient tracking)
+model MessageSendRecord {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Message
+  messageId String
+  
+  // Contact (encrypted, access via blind index)
+  contactId String
+  
+  // Channel and Locale
+  channel CommunicationChannel
+  locale  String
+  
+  // Provider Details
+  providerMessageId String? // Provider's tracking ID
+  
+  // Status
+  status MessageSendStatus @default(QUEUED)
+  
+  // Timestamps
+  queuedAt    DateTime  @default(now())
+  sentAt      DateTime?
+  deliveredAt DateTime?
+  bouncedAt   DateTime?
+  complainedAt DateTime?
+  openedAt    DateTime? // If tracking enabled
+  clickedAt   DateTime? // If tracking enabled
+  
+  // Failure
+  failedAt     DateTime?
+  failureReason String? @db.Text
+  
+  // Retry
+  retryCount Int @default(0)
+  
+  // Idempotency
+  idempotencyKey String @unique
+  
+  // Quiet Hours Deferred
+  deferredUntil DateTime?
+  
+  @@index([messageId])
+  @@index([contactId])
+  @@index([status])
+  @@index([channel])
+  @@index([providerMessageId])
+  @@index([queuedAt])
+}
+
+enum MessageSendStatus {
+  QUEUED      // Queued for sending
+  DEFERRED    // Deferred due to quiet hours
+  SENDING     // Being sent
+  SENT        // Sent to provider
+  DELIVERED   // Confirmed delivered
+  OPENED      // Opened (if tracking enabled)
+  CLICKED     // Clicked (if tracking enabled)
+  BOUNCED     // Bounced
+  COMPLAINED  // Spam complaint
+  FAILED      // Failed to send
+  SKIPPED     // Skipped (no consent, suppressed, etc.)
+}
+
+// FREQUENCY CAP (Cross-channel limit per contact)
+model FrequencyCap {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Contact
+  contactId String
+  
+  // Window
+  windowStart DateTime
+  windowEnd   DateTime
+  
+  // Count
+  messagesSent Int @default(0)
+  maxMessages  Int // From config
+  
+  @@unique([contactId, windowStart])
+  @@index([contactId])
+  @@index([windowEnd])
+}
+
+// CHANNEL PAUSE (Per-channel kill switch)
+model ChannelPause {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Channel
+  channel CommunicationChannel @unique
+  
+  // Pause Details
+  paused     Boolean @default(false)
+  pausedBy   String?
+  pausedAt   DateTime?
+  pauseReason String? @db.Text
+  
+  // Auto-pause Triggers
+  autoPausedByBounceRate    Boolean @default(false)
+  autoPausedByComplaintRate Boolean @default(false)
+  
+  @@index([channel])
+  @@index([paused])
+}
+
+// ALERT (Monitoring alerts)
+model Alert {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Alert Type
+  alertType AlertType
+  
+  // Severity
+  severity AlertSeverity
+  
+  // Details
+  channel     CommunicationChannel?
+  messageId   String?
+  metric      String? // "bounce_rate", "complaint_rate", "cost_spike"
+  currentValue String?
+  threshold   String?
+  
+  // Status
+  acknowledged   Boolean   @default(false)
+  acknowledgedBy String?
+  acknowledgedAt DateTime?
+  
+  // Resolution
+  resolved   Boolean   @default(false)
+  resolvedBy String?
+  resolvedAt DateTime?
+  resolution String? @db.Text
+  
+  @@index([alertType])
+  @@index([severity])
+  @@index([acknowledged])
+  @@index([resolved])
+}
+
+enum AlertType {
+  BOUNCE_RATE_SPIKE
+  COMPLAINT_RATE_SPIKE
+  COST_SPIKE
+  DELIVERY_FAILURE
+  CHANNEL_DOWN
+  FREQUENCY_CAP_EXCEEDED
+}
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  ERROR
+  CRITICAL
+}
+
+// MESSAGE TEMPLATE (Reusable templates)
+model MessageTemplate {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Template Identity
+  slug String @unique
+  name String
+  
+  // Template Type
+  channel CommunicationChannel
+  topic   CommunicationTopic
+  
+  // Localized Content
+  subjectHt String?
+  subjectFr String?
+  subjectEn String?
+  
+  bodyHt String? @db.Text
+  bodyFr String? @db.Text
+  bodyEn String? @db.Text
+  
+  // Template Variables
+  variables String[] // ["firstName", "candidateName", "eventDate"]
+  
+  // Usage
+  useCount Int @default(0)
+  
+  @@index([channel])
+  @@index([topic])
+}
+
+// RECIPIENT CONFIGURATION (Funds destination)
+model RecipientConfig {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Recipient Identity
+  legalName    String
+  taxId        String? // Tax ID or equivalent
+  country      String
+  
+  // Account Information (encrypted)
+  accountType      String  // "bank_account", "stripe_account", etc.
+  accountReference String  @db.Text // Encrypted account details
+  
+  // Provider-specific
+  provider          String  // Which payment provider
+  providerAccountId String? // Provider's account ID
+  
+  // Verification
+  verified         Boolean @default(false)
+  verifiedBy       String?
+  verifiedAt       DateTime?
+  verificationNotes String? @db.Text
+  
+  // Status
+  isActive Boolean @default(false)
+  
+  // Change Management
+  createdBy      String
+  createdByEmail String
+  
+  // Audit
+  previousConfigId String? // Links to replaced config
+  
+  // Relations
+  transferRequests TransferRequest[]
+  
+  @@index([isActive])
+  @@index([provider])
+}
+
+// TRANSFER REQUESTS (Dual approval required)
+model TransferRequest {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Transfer Details
+  amountCents Int
+  currency    String @default("USD")
+  
+  // Recipient
+  recipientConfigId String
+  recipientConfig   RecipientConfig @relation(fields: [recipientConfigId], references: [id])
+  
+  // Period Covered
+  periodStart DateTime
+  periodEnd   DateTime
+  
+  // Status
+  status TransferStatus @default(DRAFT)
+  
+  // Approval Workflow (Dual approval)
+  requestedBy      String
+  requestedByEmail String
+  requestedAt      DateTime @default(now())
+  
+  firstApprovedBy      String?
+  firstApprovedByEmail String?
+  firstApprovedAt      DateTime?
+  
+  secondApprovedBy      String?
+  secondApprovedByEmail String?
+  secondApprovedAt      DateTime?
+  
+  rejectedBy      String?
+  rejectedByEmail String?
+  rejectedAt      DateTime?
+  rejectionReason String? @db.Text
+  
+  // Execution
+  executedAt    DateTime?
+  executedBy    String?
+  providerTransferId String? @unique
+  
+  // Failure
+  failedAt      DateTime?
+  failureReason String? @db.Text
+  
+  // Notes
+  notes String? @db.Text
+  
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum TransferStatus {
+  DRAFT                    // Being prepared
+  PENDING_FIRST_APPROVAL   // Awaiting first approval
+  PENDING_SECOND_APPROVAL  // Awaiting second approval
+  APPROVED                 // Ready to execute
+  EXECUTING                // Transfer in progress
+  COMPLETED                // Successfully transferred
+  FAILED                   // Transfer failed
+  REJECTED                 // Approval rejected
+  CANCELLED                // Cancelled before execution
+}
+
+// RECONCILIATION RECORDS
+model ReconciliationRun {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Provider
+  provider String
+  
+  // Period
+  periodStart DateTime
+  periodEnd   DateTime
+  
+  // Results
+  status ReconciliationStatus
+  
+  // Counts
+  ourRecordCount      Int
+  providerRecordCount Int
+  matchedCount        Int
+  mismatchCount       Int
+  
+  // Discrepancies
+  discrepancies Json?
+  
+  // Execution
+  startedAt   DateTime?
+  completedAt DateTime?
+  
+  // Notes
+  notes String? @db.Text
+  
+  @@index([provider])
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum ReconciliationStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  COMPLETED_WITH_DISCREPANCIES
+  FAILED
+}
+
+// COMPLIANCE RULES (Database-driven configuration)
+model ComplianceRule {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Rule Identity
+  name        String
+  description String  @db.Text
+  ruleType    RuleType
+
+  // Effective Dates
+  effectiveFrom DateTime
+  effectiveTo   DateTime?
+  isActive      Boolean  @default(true)
+
+  // Rule Configuration (JSON)
+  config Json // Flexible structure based on ruleType
+  
+  // Legal Basis (Required for audit)
+  legalBasisReference String? @db.Text
+  
+  // Versions (Change history)
+  versions ComplianceRuleVersion[]
+
+  @@index([ruleType])
+  @@index([isActive])
+  @@index([effectiveFrom])
+}
+
+enum RuleType {
+  AMOUNT_LIMIT
+  CUMULATIVE_CAP
+  COUNTRY_RESTRICTION
+  ELIGIBILITY_CHECK
+  FUNDRAISING_PERIOD
+  SANCTIONS_SCREENING
+  PROHIBITED_SOURCE
+  PRE_CAMPAIGN_BLOCK
+}
+
+// COMPLIANCE RULE VERSIONS (Change history with dual approval)
+model ComplianceRuleVersion {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Rule Reference
+  ruleId      String
+  rule        ComplianceRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  // Version Data
+  version     Int
+  name        String
+  description String @db.Text
+  ruleType    RuleType
+  config      Json
+  legalBasisReference String? @db.Text // Required for legal audit trail
+
+  // Effective Dates
+  effectiveFrom DateTime
+  effectiveTo   DateTime?
+  isActive      Boolean
+
+  // Workflow
+  status      RuleVersionStatus @default(DRAFT)
+  createdBy   String // User ID
+  createdByEmail String
+  
+  // Dual Approval
+  approvedBy        String? // First approver user ID
+  approvedByEmail   String?
+  approvedAt        DateTime?
+  
+  secondApprovedBy      String? // Second approver user ID
+  secondApprovedByEmail String?
+  secondApprovedAt      DateTime?
+  
+  rejectedBy      String?
+  rejectedByEmail String?
+  rejectedAt      DateTime?
+  rejectionReason String? @db.Text
+
+  // Applied to live system
+  activatedAt DateTime?
+  activatedBy String?
+
+  @@index([ruleId])
+  @@index([status])
+  @@index([version])
+}
+
+enum RuleVersionStatus {
+  DRAFT
+  PENDING_FIRST_APPROVAL
+  PENDING_SECOND_APPROVAL
+  APPROVED
+  REJECTED
+  ACTIVE
+  SUPERSEDED
+}
+
+// ELIGIBILITY ATTESTATIONS (Versioned by counsel)
+model EligibilityAttestation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Attestation Identity
+  key         String  @unique // e.g., "haitian_citizen", "own_funds", "not_foreign_agent"
+  version     Int     @default(1)
+  
+  // Localized Text
+  textHt String @db.Text
+  textFr String @db.Text
+  textEn String @db.Text
+  
+  // Legal Reference
+  legalBasis String @db.Text
+  
+  // Status
+  isActive   Boolean @default(true)
+  isRequired Boolean @default(true)
+  
+  // Effective Dates
+  effectiveFrom DateTime @default(now())
+  effectiveTo   DateTime?
+  
+  // Change Management
+  createdBy      String
+  createdByEmail String
+  approvedBy     String?
+  approvedByEmail String?
+  approvedAt     DateTime?
+  
+  @@index([key])
+  @@index([isActive])
+  @@index([version])
+}
+
+// COMPLIANCE CHECK RESULTS (One per donation attempt)
+model ComplianceCheck {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Donor Identification
+  donorEmail      String
+  donorEmailNormalized String // Lowercase, no dots in Gmail, etc.
+  donorFingerprint String? // Payment method + device signals
+  donorIpAddress  String?
+  donorCountry    String? // IP-derived
+  declaredCountry String  // User-provided
+
+  // Transaction Details
+  amountCents     Int
+  currency        String @default("USD")
+  
+  // Payment Method Info
+  paymentMethodType     String? // "card", "apple_pay", "google_pay"
+  paymentMethodFingerprint String? // Provider-specific fingerprint
+  cardBin             String? // First 6 digits
+  cardCountry         String? // Issuing country
+  cardType            String? // "credit", "debit", "prepaid", "corporate"
+  
+  // Attestations Captured
+  attestations Json // {key: {version, text, timestamp, ipCountry}}
+  
+  // Check Results
+  result        ComplianceResult
+  reasons       String[] // Machine-readable reason codes
+  reasonDetails Json // Detailed explanation per reason
+  
+  // Rules Applied
+  rulesVersion  String // Snapshot of rule versions at check time
+  rulesApplied  Json // Array of {ruleId, ruleType, version, result}
+  
+  // Cumulative Tracking
+  donorHistoricalTotal Int @default(0) // Total before this attempt
+  donorNewTotal        Int // Total including this attempt
+  
+  // Review Workflow
+  reviewStatus    ReviewStatus @default(NOT_APPLICABLE)
+  assignedTo      String?
+  reviewedBy      String?
+  reviewedAt      DateTime?
+  reviewNotes     String? @db.Text
+  reviewDecision  ReviewDecision?
+  
+  // Associated Payment (if approved and paid)
+  contributionId String? @unique
+  
+  // Relation to payment intent
+  paymentIntent PaymentIntent?
+  
+  @@index([donorEmailNormalized])
+  @@index([donorFingerprint])
+  @@index([result])
+  @@index([reviewStatus])
+  @@index([createdAt])
+}
+
+enum ComplianceResult {
+  ALLOW
+  REVIEW
+  DENY
+}
+
+enum ReviewStatus {
+  NOT_APPLICABLE  // ALLOW result, no review needed
+  PENDING         // REVIEW result, awaiting manual review
+  IN_REVIEW       // Assigned to reviewer
+  RESOLVED        // Review complete
+}
+
+enum ReviewDecision {
+  APPROVE         // Allow the contribution
+  DENY_PERMANENTLY // Deny and flag donor
+  DENY_THIS_TIME   // Deny but allow future attempts
+  ESCALATE         // Escalate to legal/compliance officer
+}
+
+// SANCTIONS SCREENING LOG
+model SanctionsScreening {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Screening Input
+  donorName   String
+  donorEmail  String
+  donorCountry String?
+  ipAddress   String?
+  
+  // Screening Provider
+  provider    String // "stub", "chainalysis", "dowjones", etc.
+  providerRequestId String?
+  
+  // Results
+  status      SanctionsStatus
+  matchScore  Float? // 0.0 - 1.0 confidence
+  matchDetails Json? // Provider-specific match data
+  
+  // Associated Check
+  complianceCheckId String?
+  
+  @@index([status])
+  @@index([donorEmail])
+  @@index([createdAt])
+}
+
+enum SanctionsStatus {
+  CLEAR           // No match
+  POTENTIAL_MATCH // Low confidence match, needs review
+  MATCH           // High confidence match, deny
+  ERROR           // Screening failed
+  SKIPPED         // Screening disabled or not applicable
+}
+
+// DONOR BLOCKLIST
+model DonorBlocklist {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Donor Identification
+  emailNormalized String  @unique
+  fingerprint     String?
+  
+  // Block Reason
+  reason        String @db.Text
+  blockedBy     String // User ID
+  blockedByEmail String
+  blockedAt     DateTime @default(now())
+  
+  // Review History
+  reviewNotes   String? @db.Text
+  
+  // Expiration (optional)
+  expiresAt DateTime?
+  
+  @@index([emailNormalized])
+  @@index([fingerprint])
+}
+
+// AUDIT LOG (Track important changes)
+model AuditLog {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Event
+  action     String
+  entityType String
+  entityId   String
+  changes    Json // Old and new values
+
+  // Actor
+  userId    String?
+  userEmail String?
+  ipAddress String?
+
+  // Additional context
+  reason String? @db.Text
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@index([action])
+}
+
+// USER ROLES (Simple role-based access)
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  email    String   @unique
+  name     String
+  role     UserRole @default(VIEWER)
+  
+  // Authentication (simplified - use proper auth in production)
+  passwordHash String?
+  
+  // Status
+  active Boolean @default(true)
+  
+  @@index([email])
+  @@index([role])
+}
+
+enum UserRole {
+  OWNER      // Can change launch mode, checklist
+  ADMIN      // Can manage content, view donations
+  COMPLIANCE // Can edit compliance rules, review flagged donations
+  VIEWER     // Can only view
+}
+
+// ISSUE PAGES (Policy positions and stances)
+model Issue {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Identity
+  slug String @unique
+
+  // Title
+  titleHt String
+  titleFr String
+  titleEn String
+
+  // Summary (short description)
+  summaryHt String? @db.Text
+  summaryFr String? @db.Text
+  summaryEn String? @db.Text
+
+  // Body (markdown)
+  bodyHt String? @db.Text
+  bodyFr String? @db.Text
+  bodyEn String? @db.Text
+
+  // Status
+  status      IssueStatus @default(DRAFT)
+  approvedBy  String? // Who approved (OWNER only)
+  approvedAt  DateTime?
+  publishedAt DateTime?
+
+  // Attribution
+  isOfficialPosition Boolean @default(false) // Campaign-approved position
+  supporterSummary   Boolean @default(true)  // Supporter summary based on public statements
+  
+  // Sources for any positions attributed to candidate
+  sources IssueSource[]
+
+  // Versioning
+  version       Int      @default(1)
+  versionHistory Json[] // Array of previous versions
+
+  // Display
+  order    Int     @default(0)
+  featured Boolean @default(false)
+
+  // Metadata
+  category String? // Optional grouping
+  tags     String[]
+
+  @@index([slug])
+  @@index([status])
+  @@index([order])
+}
+
+model IssueSource {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  issue   Issue  @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  issueId String
+
+  title      String
+  url        String
+  publisher  String?
+  date       DateTime?
+  notes      String? @db.Text
+
+  @@index([issueId])
+}
+
+enum IssueStatus {
+  DRAFT    // Being edited
+  REVIEW   // Submitted for review
+  APPROVED // Owner approved, published
+  ARCHIVED // No longer shown
+}
+
+// UPDATE POSTS (Campaign updates, announcements)
+model Update {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Identity
+  slug String @unique
+
+  // Title
+  titleHt String
+  titleFr String
+  titleEn String
+
+  // Body (markdown)
+  bodyHt String @db.Text
+  bodyFr String @db.Text
+  bodyEn String @db.Text
+
+  // Status
+  status      UpdateStatus @default(DRAFT)
+  approvedBy  String? // Who approved
+  approvedAt  DateTime?
+  publishedAt DateTime?
+
+  // Display
+  featured Boolean @default(false) // Show on home page
+  pinned   Boolean @default(false) // Keep at top of updates list
+
+  // Metadata
+  category String? // "announcement", "event", "milestone", etc.
+  tags     String[]
+  imageUrl String?
+
+  @@index([slug])
+  @@index([status])
+  @@index([publishedAt])
+  @@index([featured])
+}
+
+enum UpdateStatus {
+  DRAFT
+  APPROVED
+  ARCHIVED
+}
+
+// PRESS KIT & MEDIA CONTACT
+model PressKit {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Media Contact
+  contactName  String
+  contactEmail String
+  contactPhone String?
+
+  // Press Kit Content (markdown)
+  contentHt String? @db.Text
+  contentFr String? @db.Text
+  contentEn String? @db.Text
+
+  // Assets
+  logoUrl     String?
+  photoUrl    String?
+  bioUrl      String? // PDF bio
+  factSheetUrl String? // PDF fact sheet
+
+  // Status
+  published Boolean @default(false)
+  approvedBy String?
+  approvedAt DateTime?
+
+  // Singleton - only one record
+  @@index([published])
+}
+
+// NORD-OUEST COMMUNE DATA
+model Commune {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Identity
+  slug           String @unique
+  name           String
+  arrondissement String // Môle-Saint-Nicolas, Port-de-Paix, Saint-Louis-du-Nord
+
+  // Population
+  population2015 Int? // IHSI estimate
+  populationSource String?
+  populationSourceUrl String?
+
+  // Supporter count (from contributions)
+  supporterCount Int @default(0) // Updated periodically
+
+  // Description
+  descriptionHt String? @db.Text
+  descriptionFr String? @db.Text
+  descriptionEn String? @db.Text
+
+  // Display
+  order Int @default(0)
+
+  @@index([slug])
+  @@index([arrondissement])
+  @@index([order])
+}
+
+
+// NEWS COVERAGE SYSTEM
+model NewsArticle {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Core fields (link out only, never republish)
+  url              String  @unique // Canonical URL after redirects
+  originalUrl      String? // Original URL before canonicalization
+  headline         String  @db.Text // As published, no translation
+  outlet           String
+  publishedAt      DateTime
+  language         String // ISO 639-1 (ht, fr, en, es, etc.)
+  
+  // Optional meta-description (only if NEWS_SHOW_SNIPPETS=true)
+  metaDescription  String? @db.Text // Max 160 chars, from <meta name="description">
+  
+  // Classification
+  contentType         NewsContentType @default(NEWS)
+  contentTypeOverride Boolean         @default(false) // Admin manually set type
+  
+  // Matching & namesake detection
+  matchScore      Int             @default(0)
+  matchTier       NewsMatchTier   @default(MENTION)
+  matchConfidence NewsConfidence  @default(MEDIUM)
+  
+  // Status (no cherry-picking, no sentiment)
+  status            NewsStatus @default(PENDING)
+  publishedToSiteAt DateTime?
+  
+  // Moderation (relevance-only, audit-logged)
+  hiddenAt       DateTime?
+  hiddenBy       String? // User ID/email
+  hideReason     NewsHideReason?
+  hideReasonText String? @db.Text // Required explanation
+  
+  // Discovery source
+  source         NewsSource?   @relation(fields: [sourceId], references: [id])
+  sourceId       String?
+  discoveredVia  String // "gdelt", "rss:haitilibre", "manual", etc.
+  ingestionRunId String?
+  ingestionRun   IngestionRun? @relation(fields: [ingestionRunId], references: [id])
+  
+  // Metadata
+  domain        String // Extracted from URL
+  isPaywalled   Boolean   @default(false)
+  lastCheckedAt DateTime? // Link health check
+  linkStatus    Int? // Last HTTP status code
+  
+  @@index([status])
+  @@index([publishedAt])
+  @@index([matchTier])
+  @@index([contentType])
+  @@index([outlet])
+  @@index([domain])
+  @@index([sourceId])
+  @@index([hiddenAt])
+}
+
+enum NewsContentType {
+  NEWS
+  INTERVIEW
+  OPINION_EDITORIAL
+  OFFICIAL_STATEMENT
+  VIDEO
+  OTHER
+}
+
+enum NewsMatchTier {
+  ABOUT     // High confidence, main subject
+  MENTION   // Mentioned but not main subject
+  UNRELATED // Likely namesake or irrelevant
+}
+
+enum NewsConfidence {
+  HIGH   // Auto-publish
+  MEDIUM // Needs review
+  LOW    // Do not publish
+}
+
+enum NewsStatus {
+  PENDING      // Just discovered, needs review
+  NEEDS_REVIEW // Medium confidence, needs admin check
+  PUBLISHED    // Approved and visible on site
+  HIDDEN       // Hidden by admin with reason
+}
+
+enum NewsHideReason {
+  NOT_ABOUT_HIM                      // Namesake
+  DUPLICATE                          // Already shown
+  LINK_DEAD_OR_REMOVED               // 404 or removed by publisher
+  SPAM_OR_SCRAPER                    // Content farm or spam
+  PUBLISHER_TAKEDOWN_OR_LEGAL_REQUEST // Legal/publisher request
+  ILLEGAL_OR_HATEFUL_CONTENT         // Illegal or hate speech
+}
+
+// News source configuration
+model NewsSource {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Source identity
+  name       String          @unique // "GDELT", "HaitiLibre RSS", "Manual", etc.
+  sourceType NewsSourceType
+  
+  // Configuration
+  enabled Boolean @default(true)
+  config  Json // Source-specific config (API keys, feed URL, etc.)
+  
+  // Health monitoring
+  lastSuccessAt    DateTime?
+  lastErrorAt      DateTime?
+  lastErrorMessage String?   @db.Text
+  successCount     Int       @default(0)
+  errorCount       Int       @default(0)
+  
+  // Relationships
+  articles NewsArticle[]
+  
+  @@index([sourceType])
+  @@index([enabled])
+}
+
+enum NewsSourceType {
+  GDELT
+  RSS
+  LICENSED_API
+  MANUAL
+}
+
+// Search query patterns for discovery
+model NewsQuery {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Query definition
+  name         String // "Full name", "Context terms", etc.
+  queryPattern String  @db.Text // The actual query string
+  enabled      Boolean @default(true)
+  
+  // Matching thresholds
+  minScore         Int @default(4) // Minimum match score to consider
+  autoPublishScore Int @default(7) // Score to auto-publish
+  
+  // Usage stats
+  articlesFound Int       @default(0)
+  lastUsedAt    DateTime?
+  
+  @@index([enabled])
+}
+
+// Ingestion run tracking
+model IngestionRun {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  
+  // Run metadata
+  sourceType NewsSourceType
+  sourceName String // Which source or feed
+  status     String // "success", "partial", "failed"
+  
+  // Results
+  articlesDiscovered Int @default(0)
+  articlesCreated    Int @default(0)
+  articlesDuplicate  Int @default(0)
+  articlesRejected   Int @default(0)
+  
+  // Errors
+  errorCount    Int      @default(0)
+  errorMessages String[] // Array of error strings
+  
+  // Timing
+  durationMs  Int?
+  completedAt DateTime?
+  
+  // Relationships
+  articles NewsArticle[]
+  
+  @@index([createdAt])
+  @@index([sourceType])
+  @@index([status])
+}
+
+
+// FRAUD DETECTION AND PREVENTION
+model FraudEvent {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Event Type
+  eventType FraudEventType
+
+  // Severity
+  severity FraudSeverity @default(LOW)
+
+  // Identifiers
+  ipAddress      String?
+  email          String?
+  dimension      String? // 'ip', 'device', 'email', 'card'
+  identifier     String? // Actual identifier value
+
+  // Linkage
+  contributionId String?
+  contribution   Contribution? @relation(fields: [contributionId], references: [id])
+
+  // Metadata (JSON for flexibility)
+  metadata Json?
+
+  // Error info (if event was an error)
+  error String? @db.Text
+
+  @@index([eventType])
+  @@index([severity])
+  @@index([createdAt])
+  @@index([ipAddress])
+  @@index([email])
+  @@index([contributionId])
+}
+
+enum FraudEventType {
+  RISK_SCORE_CALCULATED
+  VELOCITY_VIOLATION
+  BOT_DETECTED
+  ALERT_TRIGGERED
+  MANUAL_REVIEW_FLAGGED
+  SUSPICIOUS_PATTERN
+}
+
+enum FraudSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+// MANUAL REVIEW QUEUE
+model ManualReviewItem {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Item being reviewed
+  contributionId String
+  contribution   Contribution @relation(fields: [contributionId], references: [id])
+
+  // Review reason
+  reason    String @db.Text
+  riskScore Int?
+
+  // Status
+  status ManualReviewStatus @default(PENDING)
+
+  // Resolution
+  reviewedBy    String? // User ID/email
+  reviewedAt    DateTime?
+  decision      ManualReviewDecision?
+  decisionNotes String? @db.Text
+
+  // Follow-up
+  requiresEscalation Boolean @default(false)
+  escalatedTo        String?
+  escalatedAt        DateTime?
+
+  @@index([status])
+  @@index([contributionId])
+  @@index([createdAt])
+}
+
+enum ManualReviewStatus {
+  PENDING
+  IN_REVIEW
+  ESCALATED
+  RESOLVED
+}
+
+enum ManualReviewDecision {
+  APPROVE
+  DENY
+  REQUEST_MORE_INFO
+}
+
+// EMAIL VERIFICATION TOKENS (for medium-risk donations)
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Linkage
+  contributionId String       @unique
+  contribution   Contribution @relation(fields: [contributionId], references: [id])
+
+  // Token
+  token String @unique
+
+  // Status
+  verified   Boolean   @default(false)
+  verifiedAt DateTime?
+
+  // Expiry
+  expiresAt DateTime
+
+  // IP tracking
+  ipAddress     String?
+  verifyIp      String?
+  
+  @@index([token])
+  @@index([expiresAt])
+}
+
+
+// RECEIPTS
+model Receipt {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Linkage
+  contributionId String
+  contribution   Contribution @relation(fields: [contributionId], references: [id])
+
+  // Receipt details
+  receiptNumber String  @unique
+  receiptData   Json // Full ReceiptData object
+  locale        String
+
+  @@index([contributionId])
+  @@index([receiptNumber])
+  @@index([createdAt])
+}
+
+// REFUND MAGIC LINKS (Self-Service Refunds)
+model RefundMagicLink {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Linkage
+  contributionId String
+  contribution   Contribution @relation(fields: [contributionId], references: [id])
+
+  // Token
+  token String @unique
+
+  // Expiry
+  expiresAt DateTime
+
+  // Usage tracking
+  usedAt DateTime?
+  usedIp String?
+
+  @@index([token])
+  @@index([contributionId])
+  @@index([expiresAt])
+}
+
+// REFUND TICKETS (Admin Queue)
+model RefundTicket {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Linkage
+  contributionId String
+  contribution   Contribution @relation(fields: [contributionId], references: [id])
+
+  // Request details
+  requestedBy    String // Email
+  requestorIp    String
+  userAgent      String
+  reason         String @db.Text
+  reasonDetails  String? @db.Text
+  amountCents    Int
+  source         RefundSource @default(SELF_SERVICE)
+
+  // Status
+  status RefundTicketStatus @default(PENDING)
+
+  // Approval
+  approvedBy  String?
+  approvedAt  DateTime?
+  adminNotes  String? @db.Text
+
+  // Denial
+  deniedBy    String?
+  deniedAt    DateTime?
+  denyReason  String? @db.Text
+
+  // Completion
+  completedAt DateTime?
+
+  @@index([status])
+  @@index([contributionId])
+  @@index([createdAt])
+}
+
+enum RefundSource {
+  SELF_SERVICE
+  ADMIN
+  BULK_REFUND
+  CHARGEBACK
+}
+
+enum RefundTicketStatus {
+  PENDING
+  APPROVED
+  DENIED
+  COMPLETED
+  CANCELLED
+}
+
+// BULK REFUND REQUESTS
+model BulkRefundRequest {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Request details
+  filters  Json // BulkRefundFilters
+  reason   String @db.Text
+  preview  Json // BulkRefundPreview
+
+  // Status
+  status BulkRefundStatus @default(DRAFT)
+
+  // Requester
+  requestedBy     String
+  requestedByRole String
+
+  // First approval
+  firstApprovedBy     String?
+  firstApprovedByRole String?
+  firstApprovedAt     DateTime?
+
+  // Second approval
+  secondApprovedBy     String?
+  secondApprovedByRole String?
+  secondApprovedAt     DateTime?
+
+  // Execution
+  executedBy     String?
+  executedAt     DateTime?
+  executionResult Json? // BulkRefundExecutionResult
+
+  // Cancellation
+  cancelledBy      String?
+  cancelledAt      DateTime?
+  cancellationReason String? @db.Text
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum BulkRefundStatus {
+  DRAFT
+  PENDING_FIRST_APPROVAL
+  PENDING_SECOND_APPROVAL
+  APPROVED
+  EXECUTING
+  COMPLETED
+  CANCELLED
+}
+
+// CHARGEBACKS (Disputes)
+model Chargeback {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Provider dispute ID
+  providerDisputeId String @unique
+
+  // Linkage
+  contributionId  String
+  contribution    Contribution @relation(fields: [contributionId], references: [id])
+  paymentIntentId String
+
+  // Dispute details
+  amountCents Int
+  currency    String
+  reason      String @db.Text
+
+  // Status
+  status ChargebackStatus @default(NEEDS_RESPONSE)
+
+  // Evidence
+  evidencePacket     Json? // EvidencePacket
+  evidenceSubmittedAt DateTime?
+  evidenceSubmittedBy String?
+  evidenceDeadline   DateTime?
+
+  // Reminders
+  reminderSent   Boolean @default(false)
+  reminderSentAt DateTime?
+
+  // Resolution
+  outcome    String? // 'WON', 'LOST', 'ACCEPTED'
+  resolvedAt DateTime?
+
+  @@index([status])
+  @@index([contributionId])
+  @@index([evidenceDeadline])
+  @@index([createdAt])
+}
+
+enum ChargebackStatus {
+  NEEDS_RESPONSE
+  EVIDENCE_SUBMITTED
+  UNDER_REVIEW
+  WON
+  LOST
+  ACCEPTED
+}
+
+
+// ============================================================================
+// PRIVACY & DATA PROTECTION
+// ============================================================================
+
+// DONOR MODEL (Extended with encryption fields)
+// Note: Contribution model already references Donor, this extends it
+model Donor {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Encrypted PII (AES-256-GCM)
+  encryptedName  String // Field-level encryption with separate key
+  encryptedEmail String // Field-level encryption with separate key
+
+  // Blind indexes for searchable fields (HMAC-SHA256)
+  emailBlindIndex String @unique // Keyed hash of normalized email
+  nameBlindIndex  String // Keyed hash of normalized name
+
+  // Non-sensitive data
+  country       String
+  locale        String @default("en")
+  isAnonymous   Boolean @default(false)
+  anonymizedAt  DateTime?
+
+  // ROOTS BY COMMUNE (Optional family connection)
+  rootsCommune String? // Commune slug or "other" or "elsewhere"
+
+  // Legal hold (prevents deletion during investigation/litigation)
+  legalHold           Boolean @default(false)
+  legalHoldReason     String? @db.Text
+  legalHoldSetBy      String?
+  legalHoldSetAt      DateTime?
+  legalHoldReleasedBy String?
+  legalHoldReleasedAt DateTime?
+
+  // Relationships
+  contributions       Contribution[]
+  consents            Consent[]
+  dataSubjectRequests DataSubjectRequest[]
+  mySupportSessions   MySupportSession[]
+  supporterPage       SupporterPage?
+
+  @@index([emailBlindIndex])
+  @@index([nameBlindIndex])
+  @@index([legalHold])
+  @@index([anonymizedAt])
+  @@index([rootsCommune])
+}
+
+// CONSENT RECORDS
+model Consent {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Donor linkage
+  donorId String
+  donor   Donor  @relation(fields: [donorId], references: [id], onDelete: Cascade)
+
+  // Consent details
+  purpose ConsentPurpose
+  status  ConsentStatus  @default(PENDING)
+  basis   ConsentBasis
+
+  // Timestamps
+  grantedAt   DateTime?
+  withdrawnAt DateTime?
+
+  // Audit trail (captured at consent time)
+  ipAddress String?
+  userAgent String? @db.Text
+  locale    String
+  
+  // Legal record
+  consentText String @db.Text // Exact text shown to user
+  version     String @default("1.0") // Consent version for audit
+
+  @@index([donorId])
+  @@index([purpose, status])
+  @@index([grantedAt])
+}
+
+enum ConsentPurpose {
+  EMAIL // Email communications
+  WHATSAPP // WhatsApp communications
+  PUBLIC_RECOGNITION // Public display of name
+  ESSENTIAL // Transaction processing (auto-granted)
+}
+
+
+enum ConsentBasis {
+  EXPLICIT_CONSENT // User explicitly opted in (GDPR Article 6(1)(a))
+  IMPLIED_CONSENT // Implied from transaction (CASL)
+  LEGITIMATE_INTEREST // Business necessity (GDPR Article 6(1)(f))
+  CONTRACT // Necessary for contract (GDPR Article 6(1)(b))
+  LEGAL_OBLIGATION // Required by law (GDPR Article 6(1)(c))
+}
+
+// DATA SUBJECT REQUESTS (GDPR/CCPA/PIPEDA Rights)
+
+enum DataSubjectRequestType {
+  ACCESS // Right to access (data export)
+  ERASURE // Right to be forgotten
+  RECTIFICATION // Right to correction
+  PORTABILITY // Right to data portability
+  OBJECT // Right to object to processing
+  RESTRICT_PROCESSING // Right to restrict processing
+}
+
+enum RequestStatus {
+  PENDING // Awaiting verification
+  IN_PROGRESS // Verified, being processed
+  COMPLETED // Fulfilled
+  DENIED // Denied with reason
+  CANCELLED // Cancelled by requester
+}
+
+// MY SUPPORT SESSIONS (Passwordless auth)
+model MySupportSession {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Donor linkage
+  donorId String
+  donor   Donor  @relation(fields: [donorId], references: [id], onDelete: Cascade)
+
+  // Session token (magic link)
+  token String @unique
+
+  // Expiry
+  expiresAt      DateTime
+  lastAccessedAt DateTime
+
+  // Security
+  ipAddress String?
+  userAgent String? @db.Text
+
+  @@index([donorId])
+  @@index([token])
+  @@index([expiresAt])
+}
+
+// DATA RETENTION POLICIES (Configurable by counsel)
+model RetentionPolicy {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Entity type
+  entityType String @unique // 'Contribution', 'Donor', 'Consent', etc.
+
+  // Retention period
+  retentionPeriodDays Int // e.g., 2555 days = 7 years
+
+  // Actions allowed
+  canAnonymize Boolean @default(true)
+  canDelete    Boolean @default(false)
+
+  // Legal basis
+  legalBasis String @db.Text // Why we retain this data
+
+  // Enabled
+  enabled Boolean @default(true)
+
+  @@index([entityType])
+}
+
+// AUDIT LOG (For privacy compliance)
+model PrivacyAuditLog {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Action
+  action     String // 'CONSENT_GRANTED', 'DATA_EXPORTED', 'DATA_DELETED', etc.
+  entityType String // 'Donor', 'Consent', 'DataSubjectRequest', etc.
+  entityId   String // ID of affected entity
+
+  // Actor
+  actorType String // 'USER', 'SYSTEM', 'ADMIN'
+  actorId   String? // User ID or 'system'
+
+  // Details (scrubbed of PII)
+  details Json?
+
+  // Context
+  ipAddress String?
+  userAgent String? @db.Text
+
+  @@index([action])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
+
+
+// ============================================================================
+// CHAPTERS, ROOTS & SUPPORTER PAGES (Community Layer)
+// ============================================================================
+
+// CHAPTERS (Diaspora organizing hubs by city/country)
+model Chapter {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Identity
+  slug String @unique // "miami-fl", "montreal-qc", "paris-france"
+  name String // "Miami, FL", "Montreal, QC", "Paris, France"
+
+  // Location
+  city    String
+  state   String? // For US/Canada
+  country String // ISO 3166-1 alpha-2
+
+  // Status
+  status ChapterStatus @default(PENDING)
+
+  // Approval workflow
+  requestedBy        String // Email of organizer
+  requestedAt        DateTime @default(now())
+  approvedBy         String? // Admin user ID
+  approvedAt         DateTime?
+  rejectedBy         String?
+  rejectedAt         DateTime?
+  rejectionReason    String? @db.Text
+
+  // Organizer
+  organizerName         String?
+  organizerEmail        String?
+  organizerContactOptIn Boolean @default(false) // Show contact on public page
+
+  // Description (markdown, admin-editable)
+  descriptionHt String? @db.Text
+  descriptionFr String? @db.Text
+  descriptionEn String? @db.Text
+
+  // Aggregate counts (updated periodically)
+  memberCount      Int @default(0) // Supporters who joined this chapter
+  totalAmountCents Int @default(0) // Aggregate of all member contributions
+
+  // Settings
+  showLeaderboard Boolean @default(false) // Show member leaderboard
+  allowJoin       Boolean @default(true) // Allow new members to join
+
+  // Events
+  events ChapterEvent[]
+  
+  // Memberships
+  memberships ChapterMembership[]
+  
+  // Relations from other models
+  newsletterSubscribers NewsletterSubscriber[]
+  publicEvents          Event[]
+
+  // Moderation
+  suspended       Boolean @default(false)
+  suspendedBy     String?
+  suspendedAt     DateTime?
+  suspensionReason String? @db.Text
+  
+  // Moderation logs
+  moderationLogs ChapterModerationLog[]
+
+  @@index([slug])
+  @@index([status])
+  @@index([country])
+  @@index([suspended])
+}
+
+enum ChapterStatus {
+  PENDING  // Awaiting admin approval
+  APPROVED // Active
+  REJECTED // Application rejected
+  ARCHIVED // No longer active
+}
+
+// CHAPTER MEMBERSHIP (Many-to-many)
+model ChapterMembership {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Linkage
+  chapterId      String
+  chapter        Chapter        @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  supporterPageId String
+  supporterPage  SupporterPage @relation(fields: [supporterPageId], references: [id], onDelete: Cascade)
+
+  // Status
+  status MembershipStatus @default(ACTIVE)
+
+  // Left/removed
+  leftAt      DateTime?
+  leftReason  String? @db.Text
+  removedBy   String?
+  removedAt   DateTime?
+  removedReason String? @db.Text
+
+  @@unique([chapterId, supporterPageId])
+  @@index([chapterId])
+  @@index([supporterPageId])
+  @@index([status])
+}
+
+enum MembershipStatus {
+  ACTIVE
+  LEFT
+  REMOVED
+}
+
+// CHAPTER EVENTS (Local organizing)
+model ChapterEvent {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Chapter linkage
+  chapterId String
+  chapter   Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  // Event details
+  titleHt     String
+  titleFr     String
+  titleEn     String
+  descriptionHt String? @db.Text
+  descriptionFr String? @db.Text
+  descriptionEn String? @db.Text
+
+  // Date & location
+  eventDate DateTime
+  location  String
+
+  // Organizer
+  organizerName  String
+  organizerEmail String
+
+  // Status
+  status EventStatus @default(DRAFT)
+
+  // Approval
+  approvedBy String?
+  approvedAt DateTime?
+
+  @@index([chapterId])
+  @@index([eventDate])
+  @@index([status])
+}
+
+
+// SUPPORTER PAGES (/s/[slug])
+model SupporterPage {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Owner linkage (one per donor)
+  donorId String @unique
+  donor   Donor  @relation(fields: [donorId], references: [id], onDelete: Cascade)
+
+  // Custom URL
+  slug String @unique // "jeanbaptiste", "marie-claire-123"
+
+  // Display name (public, scrubbed)
+  displayName String // "Jean B.", "Marie-Claire"
+
+  // Story (markdown, 500 chars max)
+  storyHt String? @db.Text
+  storyFr String? @db.Text
+  storyEn String? @db.Text
+
+  // Privacy settings
+  showName             Boolean @default(true) // Show display name
+  showRootsCommune     Boolean @default(false) // Show commune on page
+  showChapterMembership Boolean @default(false) // Show chapter on page
+
+  // Attribution tracking
+  referralCount      Int @default(0) // Number of supporters who joined via this page
+  referralAmountCents Int @default(0) // Total from referred supporters
+
+  // Status
+  status       SupporterPageStatus @default(ACTIVE)
+  publishedAt  DateTime?
+
+  // Moderation
+  suspended       Boolean @default(false)
+  suspendedBy     String?
+  suspendedAt     DateTime?
+  suspensionReason String? @db.Text
+  reportCount     Int @default(0)
+
+  // Chapter membership
+  chapterMemberships ChapterMembership[]
+
+  // Moderation reports
+  reports SupporterPageReport[]
+
+  @@index([slug])
+  @@index([status])
+  @@index([suspended])
+  @@index([publishedAt])
+}
+
+enum SupporterPageStatus {
+  DRAFT
+  ACTIVE
+  SUSPENDED
+  REMOVED
+}
+
+// SUPPORTER PAGE REPORTS (User flagging)
+model SupporterPageReport {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Reported page
+  supporterPageId String
+  supporterPage   SupporterPage @relation(fields: [supporterPageId], references: [id], onDelete: Cascade)
+
+  // Report details
+  reason        SupporterPageReportReason
+  reasonDetails String? @db.Text
+
+  // Reporter (anonymous)
+  reporterIp    String
+  reporterEmail String? // Optional
+
+  // Status
+  status ReviewStatus @default(PENDING)
+
+  // Resolution
+  reviewedBy    String?
+  reviewedAt    DateTime?
+  reviewNotes   String? @db.Text
+  actionTaken   String? // "no_action", "warning", "content_removed", "page_suspended"
+
+  @@index([supporterPageId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum SupporterPageReportReason {
+  PROFANITY
+  IMPERSONATION
+  SPAM
+  HARASSMENT
+  INAPPROPRIATE_CONTENT
+  OTHER
+}
+
+// RESERVED SLUGS (Prevent impersonation)
+model ReservedSlug {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  slug   String @unique // "bellefleur", "campaign", "official", "senator"
+  reason String @db.Text // Why it's reserved
+
+  @@index([slug])
+}
+
+// ROOTS AGGREGATES (Cached counts by commune)
+// Updated periodically from Donor.rootsCommune
+model RootsAggregate {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Commune identifier
+  communeSlug String @unique // Matches Commune.slug or "other" or "elsewhere"
+
+  // Aggregate count (suppressed if below minimum)
+  supporterCount Int @default(0)
+  isSuppressed   Boolean @default(false) // True if count < ROOTS_MIN_COUNT
+
+  // Last calculation
+  lastCalculatedAt DateTime @default(now())
+
+  @@index([communeSlug])
+  @@index([supporterCount])
+}
+
+// ATTRIBUTION TRACKING (Privacy-safe referral tracking)
+model Attribution {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Referred contribution
+  contributionId String       @unique
+  contribution   Contribution @relation(fields: [contributionId], references: [id], onDelete: Cascade)
+
+  // Referrer (supporter page)
+  referrerPageSlug String? // Null for organic/direct
+
+  // Referral metadata
+  referralSource String? // "supporter_page", "chapter_page", "social", etc.
+
+  @@index([referrerPageSlug])
+  @@index([createdAt])
+}
+
+// CHAPTER MODERATION LOG
+model ChapterModerationLog {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Chapter
+  chapterId String
+  chapter   Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  // Action
+  action     String // "APPROVED", "REJECTED", "SUSPENDED", "UNSUSPENDED"
+  actionBy   String // User ID
+  actionByEmail String
+  reason     String? @db.Text
+
+  // Context
+  metadata Json?
+
+  @@index([chapterId])
+  @@index([createdAt])
+}
+
+
+// ============================================================================
+// ADMIN CONSOLE - RBAC, MFA, AUDIT, DATA SUBJECT REQUESTS
+// ============================================================================
+
+// ADMIN USERS (Role-based access control)
+model AdminUser {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Identity
+  email        String      @unique
+  name         String
+  role         AdminRole
+  
+  // Authentication (use proper auth provider in production)
+  passwordHash String?
+  
+  // MFA (Required for OWNER, COMPLIANCE, FINANCE)
+  mfaEnabled    Boolean @default(false)
+  mfaSecret     String? // TOTP secret (encrypted)
+  mfaBackupCodes String[] // Encrypted backup codes
+  mfaEnabledAt  DateTime?
+  
+  // Status
+  active         Boolean @default(true)
+  suspended      Boolean @default(false)
+  suspendedBy    String?
+  suspendedAt    DateTime?
+  suspensionReason String? @db.Text
+  
+  // Permissions
+  canRevealPII   Boolean @default(false) // Additional permission flag
+  
+  // Invitation/Approval (Dual approval for OWNER/COMPLIANCE/FINANCE)
+  invitedBy        String?
+  invitedByEmail   String?
+  invitedAt        DateTime?
+  
+  approvedBy       String? // First approver for privileged roles
+  approvedByEmail  String?
+  approvedAt       DateTime?
+  
+  secondApprovedBy      String? // Second approver
+  secondApprovedByEmail String?
+  secondApprovedAt      DateTime?
+  
+  // Login tracking
+  lastLoginAt       DateTime?
+  lastLoginIp       String?
+  failedLoginCount  Int @default(0)
+  lastFailedLoginAt DateTime?
+  
+  // Rate limiting for PII reveals
+  piiRevealCount    Int @default(0) // Reset daily
+  piiRevealResetAt  DateTime?
+  
+  // Relations
+  sessions          AdminSession[]
+  auditLogs         TamperEvidentAuditLog[] @relation("Actor")
+  piiReveals        PIIReveal[]
+  dataSubjectRequests DataSubjectRequest[]
+  
+  @@index([email])
+  @@index([role])
+  @@index([active])
+}
+
+enum AdminRole {
+  OWNER       // Full access, can change launch mode, manage users
+  COMPLIANCE  // Compliance rules, review queue, sanctions
+  FINANCE     // Ledger, reconciliation, transfers, exports
+  EDITOR      // Content management, intake, news
+  MODERATOR   // Community features, Q&A, volunteers
+  READ_ONLY   // View-only access to non-PII data
+}
+
+// ADMIN SESSIONS (Track active sessions, allow revocation)
+model AdminSession {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // User
+  userId String
+  user   AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Session Details
+  token      String   @unique // Hashed session token
+  expiresAt  DateTime
+  lastUsedAt DateTime @default(now())
+  
+  // Device Info
+  ipAddress String?
+  userAgent String? @db.Text
+  
+  // Revocation
+  revoked     Boolean @default(false)
+  revokedBy   String?
+  revokedAt   DateTime?
+  revokeReason String?
+  
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+  @@index([revoked])
+}
+
+// TAMPER-EVIDENT AUDIT LOG (Hash-chained, immutable)
+model TamperEvidentAuditLog {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Sequence (strictly increasing, no gaps)
+  sequenceNumber BigInt @unique
+  
+  // Event
+  action     String
+  entityType String
+  entityId   String?
+  changes    Json?
+  
+  // Actor
+  actorId       String?
+  actor         AdminUser? @relation("Actor", fields: [actorId], references: [id])
+  actorEmail    String?
+  actorRole     String?
+  ipAddress     String?
+  userAgent     String? @db.Text
+  
+  // Context
+  reason      String? @db.Text // Required for privileged actions
+  metadata    Json?
+  
+  // Hash Chain (tamper detection)
+  previousHash String // SHA-256 hash of previous entry
+  currentHash  String @unique // SHA-256 hash of this entry
+  
+  // Off-system backup (S3, external log service)
+  backedUpAt   DateTime?
+  backupRef    String? // Reference to external backup
+  
+  @@index([sequenceNumber])
+  @@index([action])
+  @@index([entityType, entityId])
+  @@index([actorId])
+  @@index([createdAt])
+}
+
+// PII REVEAL TRACKING (Rate-limited, audit-logged)
+model PIIReveal {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Admin who revealed
+  adminId       String
+  admin         AdminUser @relation(fields: [adminId], references: [id])
+  adminEmail    String
+  
+  // What was revealed
+  entityType String // "Contribution", "Donor", etc.
+  entityId   String
+  fields     String[] // Which PII fields: ["email", "name", "address"]
+  
+  // Required reason
+  reason     String @db.Text
+  
+  // Context
+  ipAddress  String?
+  
+  @@index([adminId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
+
+// DATA SUBJECT REQUESTS (GDPR/Privacy)
+model DataSubjectRequest {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Request Type
+  requestType DataSubjectRequestType
+  
+  // Subject (linked to Donor)
+  donorId      String?
+  donor        Donor? @relation(fields: [donorId], references: [id])
+  subjectEmail String
+  subjectName  String?
+  
+  // Status
+  status       DataSubjectRequestStatus @default(PENDING)
+  
+  // Verification
+  verified     Boolean @default(false)
+  verifiedBy   String?
+  verifiedAt   DateTime?
+  verificationMethod String? // "email_link", "manual_review"
+  
+  // Processing
+  assignedTo      String?
+  assignedToUser  AdminUser? @relation(fields: [assignedTo], references: [id])
+  processedBy     String?
+  processedAt     DateTime?
+  
+  // Results
+  dataExportUrl   String? // Signed URL for data export
+  dataExportedAt  DateTime?
+  deletionCompletedAt DateTime?
+  
+  // Legal Hold (Prevents deletion)
+  legalHoldActive Boolean @default(false)
+  legalHoldReason String? @db.Text
+  legalHoldBy     String?
+  legalHoldAt     DateTime?
+  
+  // Denial
+  deniedAt        DateTime?
+  deniedBy        String?
+  denialReason    String? @db.Text
+  
+  // Communication
+  contactEmail    String // Email for updates
+  notes           String? @db.Text
+  
+  @@index([donorId])
+  @@index([subjectEmail])
+  @@index([status])
+  @@index([requestType])
+  @@index([createdAt])
+}
+
+
+enum DataSubjectRequestStatus {
+  PENDING        // New request
+  VERIFYING      // Awaiting identity verification
+  VERIFIED       // Identity confirmed
+  IN_PROGRESS    // Being processed
+  COMPLETED      // Request fulfilled
+  DENIED         // Request denied (with reason)
+  CANCELLED      // Cancelled by requester
+  ON_LEGAL_HOLD  // Cannot process due to legal hold
+}
+
+// BACKGROUND JOBS (For large exports, reconciliation, etc.)
+model BackgroundJob {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Job Type
+  jobType    String // "export_donations", "reconciliation", "email_campaign"
+  jobSubtype String? // Additional classification
+  
+  // Status
+  status     BackgroundJobStatus @default(PENDING)
+  
+  // Scheduling
+  scheduledFor DateTime?
+  startedAt    DateTime?
+  completedAt  DateTime?
+  
+  // Progress
+  progress       Float @default(0) // 0.0 to 1.0
+  totalItems     Int?
+  processedItems Int @default(0)
+  
+  // Results
+  resultUrl    String? // S3 URL or file path
+  resultSize   Int? // Size in bytes
+  errorMessage String? @db.Text
+  
+  // Requester
+  requestedBy      String
+  requestedByEmail String
+  
+  // Input Parameters
+  parameters Json?
+  
+  // Retry Logic
+  retryCount Int @default(0)
+  maxRetries Int @default(3)
+  
+  // Timeout
+  timeoutAt  DateTime?
+  
+  @@index([jobType])
+  @@index([status])
+  @@index([requestedBy])
+  @@index([createdAt])
+  @@index([scheduledFor])
+}
+
+enum BackgroundJobStatus {
+  PENDING    // Queued, not started
+  RUNNING    // Currently executing
+  COMPLETED  // Successfully completed
+  FAILED     // Failed with error
+  CANCELLED  // Cancelled by user
+  TIMEOUT    // Exceeded timeout
+}
+
+// ALERT SETTINGS (Thresholds for admin notifications)
+model AlertSetting {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Alert Type
+  alertKey    String @unique // "high_risk_disputes", "webhook_failures", etc.
+  
+  // Configuration
+  enabled     Boolean @default(true)
+  threshold   Float? // Numeric threshold
+  timeWindow  Int? // Time window in minutes
+  
+  // Notification Channels
+  emailRecipients String[] // Admin emails to notify
+  slackWebhook    String? // Optional Slack webhook
+  
+  // Alert Settings
+  severity       AlertSeverity @default(WARNING)
+  cooldownMinutes Int @default(60) // Minimum time between alerts
+  
+  // Metadata
+  description String @db.Text
+  updatedBy   String?
+  
+  @@index([alertKey])
+  @@index([enabled])
+}
+
+
+// ALERT EVENTS (Fired alerts)
+model AlertEvent {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Alert
+  alertKey   String
+  
+  // Event Details
+  message    String @db.Text
+  severity   AlertSeverity
+  value      Float? // Actual value that triggered alert
+  threshold  Float? // Threshold that was exceeded
+  
+  // Notification
+  notified      Boolean @default(false)
+  notifiedAt    DateTime?
+  notifiedTo    String[] // Emails notified
+  
+  // Acknowledgement
+  acknowledged   Boolean @default(false)
+  acknowledgedBy String?
+  acknowledgedAt DateTime?
+  
+  // Related entities
+  relatedType String?
+  relatedId   String?
+  metadata    Json?
+  
+  @@index([alertKey])
+  @@index([createdAt])
+  @@index([acknowledged])
+}
+
+// SYSTEM HEALTH METRICS (Track system health)
+model HealthMetric {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Metric Type
+  metricType String // "webhook_failures", "job_queue_depth", "error_rate"
+  
+  // Value
+  value      Float
+  
+  // Time Series
+  timestamp  DateTime @default(now())
+  
+  // Metadata
+  labels     Json? // Additional dimensions
+  
+  @@index([metricType, timestamp])
+  @@index([createdAt])
+}
+
+// DEMO DATA SEED TRACKING (Prevent running in production)
+model DemoDataSeed {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Seed Information
+  seedType    String // "contributions", "volunteers", "events"
+  environment String // Must be "development" or "staging"
+  recordCount Int
+  
+  // Execution
+  executedBy     String
+  executedAt     DateTime @default(now())
+  
+  // Cleanup
+  cleanedUp   Boolean @default(false)
+  cleanedUpAt DateTime?
+  
+  // Block production seeds
+  @@index([environment])
+  @@index([createdAt])
+}
+
+// SAVED VIEWS (User-defined table filters/sorts)
+model SavedView {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // View Identity
+  name        String
+  description String?
+  
+  // Table
+  tableType   String // "donations", "compliance_reviews", etc.
+  
+  // Filters
+  filters     Json
+  
+  // Sort
+  sortBy      String?
+  sortOrder   String? // "asc" or "desc"
+  
+  // Columns
+  visibleColumns String[]
+  
+  // Owner
+  userId      String
+  
+  // Sharing
+  isPublic    Boolean @default(false)
+  
+  @@index([userId])
+  @@index([tableType])
+}
+
+// WEBHOOK FAILURE TRACKING (For system health monitoring)
+model WebhookFailure {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Provider
+  provider      String
+  eventType     String
+  
+  // Event
+  eventId       String
+  payload       Json
+  
+  // Failure Details
+  errorMessage  String @db.Text
+  httpStatus    Int?
+  retryCount    Int @default(0)
+  
+  // Resolution
+  resolved      Boolean @default(false)
+  resolvedAt    DateTime?
+  resolvedBy    String?
+  resolutionNote String? @db.Text
+  
+  @@index([provider])
+  @@index([resolved])
+  @@index([createdAt])
+}
+

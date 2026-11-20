@@ -1,0 +1,240 @@
+{
+  "common": {
+    "appName": "Diaspora4Bellefleur",
+    "loading": "Chajman...",
+    "error": "Erè",
+    "close": "Fèmen",
+    "cancel": "Anile",
+    "confirm": "Konfime",
+    "save": "Anrejistre",
+    "back": "Retou",
+    "next": "Swivan",
+    "learnMore": "Aprann plis"
+  },
+  "candidate": {
+    "name": "Jean Fritznel Bellefleur",
+    "office": "Senatè",
+    "department": "Nòdwès"
+  },
+  "nav": {
+    "home": "Akèy",
+    "about": "Konsènan",
+    "nordOuest": "Nòdwès",
+    "news": "Enfòmasyon",
+    "getInvolved": "Patisipe",
+    "contribute": "Kontribye",
+    "contact": "Kontak",
+    "openMenu": "Louvri meni",
+    "closeMenu": "Fèmen meni"
+  },
+  "cta": {
+    "infoOnly": "Aprann plis",
+    "waitlist": "Resevwa enfòmasyon",
+    "donationsLive": "Bay $5-$10"
+  },
+  "language": {
+    "switchLanguage": "Chanje lang",
+    "currentLanguage": "Kreyòl Ayisyen",
+    "selectLanguage": "Chwazi lang"
+  },
+  "affiliation": {
+    "independent": "Inisyativ sipòtè endepandan, pa otorize pa oswa afilye ak kandida a, kanpay li a oswa nenpòt pati",
+    "authorized": "Otorize pa {candidateName} pou Senatè",
+    "coordinated": "Kowòdone ak kanpay {candidateName}"
+  },
+  "candidacyStatus": {
+    "unverified": "Estatik kandida: Pa verifye ankò",
+    "registeredPreliminary": "Enskri sou lis preliminè kandida yo",
+    "onFinalList": "Konfime sou bilten final la",
+    "notOnFinalList": "Pa sou bilten final la"
+  },
+  "footer": {
+    "sitemap": "Plan sit",
+    "legal": "Legal",
+    "privacy": "Politik sou vi prive",
+    "terms": "Kondisyon itilizasyon",
+    "contact": "Kontak",
+    "copyright": "© {year} {appName}. Tout dwa rezève.",
+    "builtFor": "Fèt pou dyaspora ayisyen k ap sipòte {candidateName}",
+    "affiliation": "Afiliyasyon"
+  },
+  "errors": {
+    "pageNotFound": "Paj pa jwenn",
+    "pageNotFoundDescription": "Paj ou ap chèche a pa egziste oswa yo te deplase li.",
+    "returnHome": "Retounen nan akèy",
+    "somethingWentWrong": "Yon erè rive",
+    "errorDescription": "Yon erè enatesidik rive. Ekip nou an resevwa enfòmasyon.",
+    "tryAgain": "Eseye ankò",
+    "reload": "Rechaje paj la",
+    "maintenanceTitle": "N ap retounen byento",
+    "maintenanceDescription": "N ap fè antretyen planifye. Tounen byento.",
+    "givingPausedTitle": "Kontribisyon an poz",
+    "givingPausedDescription": "Kontribisyon yo pa disponib tanporèman. Mèsi pou pasyans ou.",
+    "checkStatus": "Verifye estati"
+  },
+  "home": {
+    "hero": {
+      "title": "Sipòte {candidateName}",
+      "titleUnverified": "Yon inisyativ sipòtè pou {candidateName}",
+      "subtitle": "Yon vwa pou Nòdwès",
+      "subtitleUnverified": "Efò endepandan k ap sipòte kandida li pou Senatè",
+      "primaryCta": "Aprann Plis",
+      "secondaryCta": "Kòman Li Mache"
+    },
+    "progress": {
+      "heading": "Pwogrè Nou",
+      "raised": "Kolekte",
+      "supporters": "Sipòtè",
+      "countries": "Peyi",
+      "communes": "Komin Reprezante",
+      "ofGoal": "sou {goal} objektif",
+      "lastUpdated": "Mizajou {time}"
+    },
+    "whyGifts": {
+      "heading": "Poukisa Ti Kado Enpòtan",
+      "description": "Kontribisyon endividyèl bati pouvwa popilè endepandan de gwo donatè",
+      "card1Title": "Aksesib pou Tout Moun",
+      "card1Body": "Ti montan pèmèt manm dyaspora nenpòt kote patisipe yon fason siyifikatif nan sipòte reprezantasyon Nòdwès.",
+      "card2Title": "Endepandans",
+      "card2Body": "Anpil ti kontribisyon diminye depandans sou gwo donatè e ede kenbe fokis sou bezwen kominote a.",
+      "card3Title": "Sipò Laj",
+      "card3Body": "Yon baz laj kontribitè demontre vre sipò popilè atravè dyaspora a ak Ayiti."
+    },
+    "rootsMap": {
+      "heading": "Rasin nan Nòdwès",
+      "description": "Orijin sipòtè pa komin",
+      "noData": "Done kontribitè ap parèt isit lè yo disponib",
+      "supportersFrom": "{count} soti {commune}"
+    },
+    "candidateTeaser": {
+      "heading": "Konsènan {candidateName}",
+      "readProfile": "Li Pwofil Konplè",
+      "placeholder": "Pwofil kandida ap vini byento. Enfòmasyon yo ap souse epi verifye anvan piblikasyon."
+    },
+    "howItWorks": {
+      "heading": "Kòman Li Mache",
+      "step1Title": "Aprann",
+      "step1Body": "Gade enfòmasyon kandida, tout souse epi verifye",
+      "step2Title": "Kontribye",
+      "step2Body": "Fè yon kontribisyon an sekirite lè don yo louvri",
+      "step3Title": "Rete Konekte",
+      "step3Body": "Resevwa mizajou sou kanpay la ak enpak ou"
+    },
+    "faq": {
+      "heading": "Kesyon Komen",
+      "viewAll": "Gade Tout Kesyon",
+      "question1": "Èske se kanpay ofisyèl la?",
+      "answer1": "Non. Sa a se yon inisyativ sipòtè endepandan. Gade deklarasyon afiliyasyon nou anwo a.",
+      "question2": "Kilès ki ka kontribye?",
+      "answer2": "Elijibilite pou kontribye depann de lwa eleksyon ayisyen. Detay yo ap disponib anvan don yo louvri.",
+      "question3": "Kòman yo jere lajan an?",
+      "answer3": "Tout kontribisyon trete an sekirite atravè founisè peman etabli. Pa gen done kat ki anrejistre."
+    },
+    "signup": {
+      "headingInfoOnly": "Rete Enfòme",
+      "headingWaitlist": "Resevwa Mizajou",
+      "headingDonationsLive": "Sipòte Jodi a",
+      "descriptionInfoOnly": "Aprann plis sou kandidati a ak Nòdwès",
+      "descriptionWaitlist": "Resevwa notifikasyon lè fonksyon kontribisyon yo lanse",
+      "descriptionDonationsLive": "Rantre ak sipòtè soti nan dyaspora a ak Ayiti",
+      "ctaInfoOnly": "Aprann Plis sou {candidateName}",
+      "ctaWaitlist": "Rantre nan Lis Datant",
+      "ctaDonationsLive": "Fè yon Kontribisyon"
+    }
+  },
+  "contribute": {
+    "disabled": "Kontribisyon yo pa disponib pou kounye a",
+    "title": "Fè yon Kontribisyon",
+    "minimum": "Minimòm",
+    "maximum": "Maksimòm"
+  },
+  "currency": {
+    "usd": "USD",
+    "approximate": "Apeprè {amount} {currency}",
+    "htg": "HTG",
+    "eur": "EUR",
+    "cad": "CAD"
+  },
+  "date": {
+    "format": {
+      "short": "{date, date, short}",
+      "medium": "{date, date, medium}",
+      "long": "{date, date, long}",
+      "full": "{date, date, full}"
+    }
+  },
+  "profile": {
+    "intro": {
+      "statusUnverified": "Estati kandidati: Pa verifye ankò",
+      "statusPreliminary": "Enskri sou lis preliminè kandida yo",
+      "statusFinal": "Konfime sou bilten final la",
+      "statusNotOnList": "Pa sou bilten final la",
+      "candidateFor": "Kandida pou {office} {department}",
+      "description": "Pwofil sa a gen sèlman enfòmasyon ki souse epi verifye. Chak fè gen sous li ak dat verifikasyon li.",
+      "sourcedTitle": "Tout Fè yo Souse",
+      "sourcedDescription": "Chak deklarasyon sou paj sa a gen yon sitasyon. Si yo pa ka verifye enfòmasyon, yo pa montre li.",
+      "ctaSupport": "Sipòte Kandidati Sa a",
+      "ctaReportError": "Rapòte yon Erè Faktiyèl"
+    },
+    "news": {
+      "heading": "Nan Enfòmasyon",
+      "readMore": "Li plis",
+      "source": "Sous",
+      "accessed": "Aksede {date}",
+      "confidence": {
+        "confirmed": "Konfime pa plizyè sous",
+        "singleSource": "Rapòte pa {publisher}",
+        "disputedDate": "Dat ensèten"
+      }
+    },
+    "journey": {
+      "heading": "Chemen Li",
+      "subtitle": "Etap kle nan chemen li pou sèvis piblik, dokimante ak sous",
+      "biography": "Byografi",
+      "education": "Edikasyon",
+      "profession": "Eksperyans Pwofesyonèl",
+      "publicService": "Sèvis Piblik",
+      "noContent": "Enfòmasyon verifye ap parèt isit lè yo disponib.",
+      "noEntries": "Antre nan tan yo ap parèt lè fè yo verifye epi souse.",
+      "sources": "Sous",
+      "viewSource": "Gade sous",
+      "accessed": "Aksede",
+      "dateUnknown": "Dat ensèten",
+      "singleSourceNote": "Baze sou yon sèl sous pibliye",
+      "disputedDateNote": "Dat la se apepre oswa diskite",
+      "verificationNote": "Tout antre yo te verifye ak sous site",
+      "filterPlaceholder": "Filt kategori ap vini: Edikasyon • Karyè • Sivik • Eleksyon • Kandidati",
+      "category": {
+        "all": "Tout",
+        "education": "Edikasyon",
+        "career": "Karyè",
+        "civic": "Sivik",
+        "elections": "Eleksyon",
+        "candidacy": "Kandidati"
+      }
+    },
+    "supporter": {
+      "heading": "Pèspektiv Sipòtè",
+      "disclaimer": "Sa ki anba a reprezante opinyon sipòtè sit la, pa fè verifye sou kandida a.",
+      "whySupport": "Poukisa Nou Sipòte Kandidati Sa a",
+      "value1Title": "Angajman pou Nòdwès",
+      "value1Body": "Sipòtè yo apresye reprezantasyon ki fokalize sou bezwen tout 10 komin nan depatman an.",
+      "value2Title": "Koneksyon Dyaspora",
+      "value2Body": "Dyaspora a chèche kandida ki konprann tou de Ayiti ak eksperyans dyaspora a.",
+      "value3Title": "Apwòch Transparan",
+      "value3Body": "Inisyativ sa a apresye transparans, enfòmasyon souse, ak responsablite.",
+      "notEndorsement": "Sa a pa yon apwobasyon ofisyèl epi li pa reprezante sitasyon soti nan kandida a oswa kanpay la."
+    },
+    "faq": {
+      "heading": "Kesyon Poze Souvan",
+      "noQuestions": "Kesyon ak repons yo ap parèt isit.",
+      "viewAllSources": "Gade tout sous pou repons sa a",
+      "hideAllSources": "Kache sous yo"
+    },
+    "reportError": {
+      "heading": "Rapòte yon Erè Faktiyèl",
+      "description": "Si ou kwè nenpòt enfòmasyon sou paj sa a pa kòrèk, tanpri fè nou konnen.",
+      "emailLink": "Voye yon imèl ba nou ak detay ak prèv"
+    }
+  }
+}
