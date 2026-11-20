@@ -13,11 +13,14 @@
 
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import crypto from 'crypto'
 
 export function middleware(request: NextRequest) {
   const response = NextResponse.next()
-  const nonce = crypto.randomBytes(16).toString('base64')
+  
+  // Use Web Crypto API (Edge Runtime compatible)
+  const nonceArray = new Uint8Array(16)
+  crypto.getRandomValues(nonceArray)
+  const nonce = Buffer.from(nonceArray).toString('base64')
 
   // ============================================================================
   // Content Security Policy (Strict)

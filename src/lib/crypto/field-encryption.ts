@@ -14,14 +14,20 @@ import { createCipheriv, createDecipheriv, randomBytes, createHmac } from 'crypt
 
 // Encryption key from environment (32 bytes for AES-256)
 const ENCRYPTION_KEY = process.env.FIELD_ENCRYPTION_KEY
-if (!ENCRYPTION_KEY || Buffer.from(ENCRYPTION_KEY, 'hex').length !== 32) {
-  throw new Error('FIELD_ENCRYPTION_KEY must be a 32-byte hex string (64 characters)')
+
+// Lazy validation - only check when actually encrypting/decrypting
+function getEncryptionKey(): Buffer {
+  if (!ENCRYPTION_KEY || Buffer.from(ENCRYPTION_KEY, 'hex').length !== 32) {
+    throw new Error('FIELD_ENCRYPTION_KEY must be a 32-byte hex string (64 characters)')
+  }
+  return Buffer.from(ENCRYPTION_KEY, 'hex')
 }
 
-const KEY_BUFFER = Buffer.from(ENCRYPTION_KEY, 'hex')
-
-// Separate HMAC key for blind indexes (derived from encryption key)
-const HMAC_KEY = createHmac('sha256', KEY_BUFFER).update('blind-index').digest()
+// Lazy HMAC key getter
+function getHmacKey(): Buffer {
+  const keyBuffer = getEncryptionKey()
+  return createHmac('sha256', keyBuffer).update('blind-index').digest()
+}
 
 /**
  * Encrypt a field value
@@ -34,11 +40,13 @@ export async function encryptField(plaintext: string, fieldName: string): Promis
     throw new Error('Cannot encrypt empty value')
   }
   
+  const keyBuffer = getEncryptionKey()
+  
   // Generate random IV (12 bytes for GCM)
   const iv = randomBytes(12)
   
   // Create cipher (AES-256-GCM)
-  const cipher = createCipheriv('aes-256-gcm', KEY_BUFFER, iv)
+  const cipher = createCipheriv('aes-256-gcm', keyBuffer, iv)
   
   // Add authenticated data (field name, prevents ciphertext swapping between fields)
   cipher.setAAD(Buffer.from(fieldName, 'utf8'))
@@ -68,6 +76,8 @@ export async function decryptField(ciphertext: string, fieldName: string): Promi
     throw new Error('Cannot decrypt empty value')
   }
   
+  const keyBuffer = getEncryptionKey()
+  
   // Decode from base64
   const combined = Buffer.from(ciphertext, 'base64')
   
@@ -77,7 +87,7 @@ export async function decryptField(ciphertext: string, fieldName: string): Promi
   const encrypted = combined.slice(28)
   
   // Create decipher
-  const decipher = createDecipheriv('aes-256-gcm', KEY_BUFFER, iv)
+  const decipher = createDecipheriv('aes-256-gcm', keyBuffer, iv)
   
   // Set auth tag and AAD
   decipher.setAuthTag(authTag)
@@ -104,11 +114,13 @@ export function createBlindIndex(value: string, fieldName: string): string {
     throw new Error('Cannot create blind index for empty value')
   }
   
+  const hmacKey = getHmacKey()
+  
   // Normalize value (lowercase, trim)
   const normalized = value.toLowerCase().trim()
   
   // Create HMAC with field-specific salt
-  const hmac = createHmac('sha256', HMAC_KEY)
+  const hmac = createHmac('sha256', hmacKey)
   hmac.update(fieldName) // Salt with field name
   hmac.update(normalized)
   
