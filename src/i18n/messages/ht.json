@@ -187,6 +187,27 @@
         "disputedDate": "Dat ensèten"
       }
     },
+    "issues": {
+      "meta": {
+        "title": "Pwoblèm ak Pozisyon",
+        "description": "Pozisyon politik ak pran pozisyon sou pwoblèm yo"
+      },
+      "heading": "Pwoblèm ak Pozisyon",
+      "description": "Pozisyon sou kesyon kle ki konsène Nò-Dwès ak Ayiti. Kontni make kòm rezime sipòtè baze sou deklarasyon piblik epi mande verifikasyon sous.",
+      "emptyState": {
+        "heading": "Poko gen Pwoblèm Pibliye",
+        "description": "Pozisyon sou pwoblèm yo ap parèt isit lè yo redije, souse, epi apwouve."
+      },
+      "supporterSummary": "Rezime Sipòtè",
+      "officialPosition": "Pozisyon Ofisyèl",
+      "sourceCount": "{count, plural, =1 {1 sous} other {# sous}}",
+      "readMore": "Li Plis",
+      "backToIssues": "Retounen nan Pwoblèm yo",
+      "supporterSummaryLabel": "Rezime Sipòtè Baze sou Deklarasyon Piblik",
+      "supporterSummaryNote": "Pozisyon sa a atribye bay kandida a epi mande verifikasyon sous.",
+      "officialPositionLabel": "Pozisyon Apwouve pa Kanpay la",
+      "sources": "Sous"
+    },
     "journey": {
       "heading": "Chemen Li",
       "subtitle": "Etap kle nan chemen li pou sèvis piblik, dokimante ak sous",

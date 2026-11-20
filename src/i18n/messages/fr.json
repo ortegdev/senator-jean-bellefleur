@@ -187,6 +187,27 @@
         "disputedDate": "Date incertaine"
       }
     },
+    "issues": {
+      "meta": {
+        "title": "Enjeux et Positions",
+        "description": "Positions politiques et prises de position sur les enjeux"
+      },
+      "heading": "Enjeux et Positions",
+      "description": "Positions sur les questions clés concernant le Nord-Ouest et Haïti. Le contenu marqué comme résumés de supporteurs est basé sur des déclarations publiques et nécessite une vérification des sources.",
+      "emptyState": {
+        "heading": "Aucun Enjeu Publié Pour l'Instant",
+        "description": "Les positions sur les enjeux apparaîtront ici une fois qu'elles seront rédigées, sourcées et approuvées."
+      },
+      "supporterSummary": "Résumé des Supporteurs",
+      "officialPosition": "Position Officielle",
+      "sourceCount": "{count, plural, =1 {1 source} other {# sources}}",
+      "readMore": "Lire la Suite",
+      "backToIssues": "Retour aux Enjeux",
+      "supporterSummaryLabel": "Résumé des Supporteurs Basé sur des Déclarations Publiques",
+      "supporterSummaryNote": "Cette position est attribuée au candidat et nécessite une vérification des sources.",
+      "officialPositionLabel": "Position Approuvée par la Campagne",
+      "sources": "Sources"
+    },
     "journey": {
       "heading": "Son Parcours",
       "subtitle": "Étapes clés de son chemin vers le service public, documentées avec sources",
