@@ -4,7 +4,8 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { routing } from '@/i18n/routing'
 import { localeDir, dateLocales, type Locale } from '@/i18n/config'
-import { Fraunces, Inter } from 'next/font/google'
+import { Fraunces } from 'next/font/google'
+import { Inter } from 'next/font/google'
 import { Header } from '@/components/layout/Header'
 import { AffiliationStrip } from '@/components/layout/AffiliationStrip'
 import { Footer } from '@/components/layout/Footer'
@@ -16,7 +17,6 @@ const fraunces = Fraunces({
   weight: ['400', '700'],
   variable: '--font-fraunces',
   display: 'swap',
-  preload: true,
 })
 
 const inter = Inter({
@@ -24,7 +24,6 @@ const inter = Inter({
   weight: ['400', '500', '600', '700'],
   variable: '--font-inter',
   display: 'swap',
-  preload: true,
 })
 
 export async function generateMetadata({
