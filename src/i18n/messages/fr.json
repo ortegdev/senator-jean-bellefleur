@@ -48,6 +48,59 @@
     "onFinalList": "Confirmé sur le bulletin final",
     "notOnFinalList": "Pas sur le bulletin final"
   },
+  "verify": {
+    "meta": {
+      "title": "Vérifier ce site | Diaspora4Bellefleur",
+      "description": "Vérifiez l'authenticité de ce site et des communications par courriel"
+    },
+    "title": "Vérifier ce site",
+    "description": "Protégez-vous contre la fraude et le phishing en vérifiant que vous êtes sur le site officiel.",
+    "warning": {
+      "title": "Ne donnez qu'au domaine officiel",
+      "message": "Les escrocs peuvent créer de faux sites qui semblent similaires. Vérifiez toujours le domaine avant de faire une contribution.",
+      "officialDomain": "Domaine officiel"
+    },
+    "domain": {
+      "title": "Domaine officiel du site",
+      "description": "C'est le seul domaine légitime pour cette initiative. Tout autre domaine n'est pas affilié à nous.",
+      "officialUrl": "URL officielle",
+      "browserCheck": "Comment vérifier dans votre navigateur",
+      "browserCheckDescription": "La barre d'adresse de votre navigateur devrait afficher :",
+      "checkUrl": "L'URL exacte ci-dessus",
+      "checkCertificate": "Une icône de cadenas indiquant HTTPS sécurisé",
+      "checkNoWarnings": "Aucun avertissement de sécurité"
+    },
+    "email": {
+      "title": "Communications officielles par courriel",
+      "description": "Nous n'enverrons des courriels qu'à partir d'adresses utilisant ce domaine.",
+      "officialDomain": "Domaine de courriel officiel",
+      "supportAddress": "Adresse de courriel de support",
+      "authentication": {
+        "title": "Authentification des courriels",
+        "description": "Nos courriels sont authentifiés avec SPF, DKIM et DMARC. Les utilisateurs techniques peuvent vérifier :",
+        "spf": "L'enregistrement SPF vérifie que nos serveurs de messagerie sont autorisés",
+        "dkim": "La signature DKIM prouve que le courriel n'a pas été altéré",
+        "dmarc": "La politique DMARC indique aux fournisseurs de messagerie comment traiter nos courriels"
+      }
+    },
+    "social": {
+      "title": "Médias sociaux officiels",
+      "description": "Ce sont nos seuls comptes de médias sociaux officiels. Tous les autres ne sont pas affiliés à nous."
+    },
+    "redFlags": {
+      "title": "Signes d'alerte : Signes d'une arnaque",
+      "description": "Soyez méfiant de :",
+      "wrongDomain": "Domaine différent ou URL mal orthographiée",
+      "unsecureHttp": "HTTP au lieu de HTTPS (pas d'icône de cadenas)",
+      "wrongEmail": "Courriels de services gratuits (gmail, yahoo, etc.) ou domaine incorrect",
+      "urgentRequests": "Demandes urgentes d'action immédiate",
+      "personalInfo": "Demandes d'informations personnelles sensibles"
+    },
+    "report": {
+      "description": "Si vous avez rencontré un site Web, un courriel ou un compte de médias sociaux suspect prétendant nous représenter :",
+      "button": "Signaler une activité suspecte"
+    }
+  },
   "footer": {
     "sitemap": "Plan du site",
     "legal": "Mentions légales",

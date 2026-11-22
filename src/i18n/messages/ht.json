@@ -48,6 +48,59 @@
     "onFinalList": "Konfime sou bilten final la",
     "notOnFinalList": "Pa sou bilten final la"
   },
+  "verify": {
+    "meta": {
+      "title": "Verifye sit sa a | Diaspora4Bellefleur",
+      "description": "Verifye otantisite sit entènèt sa a ak kominikasyon pa imel"
+    },
+    "title": "Verifye sit sa a",
+    "description": "Pwoteje tèt ou kont fwod ak phishing lè w verifye w sou sit ofisyèl la.",
+    "warning": {
+      "title": "Bay sèlman nan domèn ofisyèl la",
+      "message": "Moun k ap bay eskrokri ka kreye fo sit entènèt ki sanble menm jan. Toujou verifye domèn lan anvan w fè yon kontribisyon.",
+      "officialDomain": "Domèn ofisyèl"
+    },
+    "domain": {
+      "title": "Domèn sit entènèt ofisyèl",
+      "description": "Sa a se sèl domèn lejitim pou inisyativ sa a. Nenpòt lòt domèn pa afilye ak nou.",
+      "officialUrl": "URL ofisyèl",
+      "browserCheck": "Kijan pou verifye nan navigatè w",
+      "browserCheckDescription": "Ba adrès navigatè w la ta dwe montre :",
+      "checkUrl": "URL egzak ki anlè a",
+      "checkCertificate": "Yon ikòn kadna k ap endike HTTPS sekirize",
+      "checkNoWarnings": "Pa gen okenn avètisman sekirite"
+    },
+    "email": {
+      "title": "Kominikasyon ofisyèl pa imel",
+      "description": "N ap voye imel sèlman nan adrès k ap itilize domèn sa a.",
+      "officialDomain": "Domèn imel ofisyèl",
+      "supportAddress": "Adrès imel sipò",
+      "authentication": {
+        "title": "Otantifikasyon imel",
+        "description": "Imel nou yo otantifye ak SPF, DKIM, ak DMARC. Itilizatè teknik yo ka verifye :",
+        "spf": "Dosye SPF verifye sèvè lapòs nou yo otorise",
+        "dkim": "Siyati DKIM pwouve imel pa t chanje",
+        "dmarc": "Politik DMARC enstrwi founisè imel yo kijan pou yo jere imel nou yo"
+      }
+    },
+    "social": {
+      "title": "Medya sosyal ofisyèl",
+      "description": "Sa yo se sèl kont medya sosyal ofisyèl nou yo. Tout lòt pa afilye ak nou."
+    },
+    "redFlags": {
+      "title": "Siy k ap anonse danje : Siy yon eskrokri",
+      "description": "Sonje sispèk de :",
+      "wrongDomain": "Domèn diferan oswa URL ki mal ekri",
+      "unsecureHttp": "HTTP olye de HTTPS (pa gen ikòn kadna)",
+      "wrongEmail": "Imel nan sèvis gratis (gmail, yahoo, elatriye) oswa domèn ki pa kòrèk",
+      "urgentRequests": "Demann ijan pou aksyon imedya",
+      "personalInfo": "Demann pou enfòmasyon pèsonèl sansib"
+    },
+    "report": {
+      "description": "Si w rankontre yon sit entènèt, imel, oswa kont medya sosyal ki sispèk k ap pretann reprezante nou :",
+      "button": "Rapòte aktivite sispèk"
+    }
+  },
   "footer": {
     "sitemap": "Plan sit",
     "legal": "Legal",
