@@ -3487,14 +3487,3 @@ ALTER TABLE "DataSubjectRequest" ADD CONSTRAINT "DataSubjectRequest_donorId_fkey
 
 -- AddForeignKey
 ALTER TABLE "DataSubjectRequest" ADD CONSTRAINT "DataSubjectRequest_assignedTo_fkey" FOREIGN KEY ("assignedTo") REFERENCES "AdminUser"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-┌─────────────────────────────────────────────────────────┐
-│  Update available 6.19.3 -> 8.0.0-rc.34                 │
-│                                                         │
-│  This is a major update - please follow the guide at    │
-│  https://pris.ly/d/major-version-upgrade                │
-│                                                         │
-│  Run the following to update                            │
-│    npm i --save-dev prisma@latest                       │
-│    npm i @prisma/client@latest                          │
-└─────────────────────────────────────────────────────────┘
-
